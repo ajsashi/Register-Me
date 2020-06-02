@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginStart="15dp"
+    android:layout_marginEnd="15dp"
+    android:layout_marginBottom="15dp"
+    android:background="@color/white"
+    android:scrollbars="none"
+    android:overScrollMode="never">
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/sub_header"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/black"
+        android:gravity="center_vertical"
+        android:paddingLeft="20dp"
+        android:text="@string/initiate_product_registration"
+        android:textAllCaps="true"
+        android:textColor="@color/white"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="15dp"
+        android:text="Medical Devices"
+        android:textColor="@color/text_orange"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sub_header" />
+
+    <TextView
+        android:id="@+id/txt_pName"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/dark_gray_color"
+        android:paddingStart="10dp"
+        android:layout_marginEnd="15dp"
+        android:text="Medical Devices"
+        android:gravity="center_vertical"
+        android:textColor="@color/sub_header"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/textView7"
+        app:layout_constraintTop_toBottomOf="@+id/textView7" />
+
+    <TextView
+        android:id="@+id/textView8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:text="Select Country"
+        android:textColor="@color/text_orange"
+        app:layout_constraintStart_toStartOf="@+id/txt_pName"
+        app:layout_constraintTop_toBottomOf="@+id/txt_pName" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="15dp"
+        android:background="@drawable/shape_oval"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/textView8"
+        app:layout_constraintTop_toBottomOf="@+id/textView8">
+
+        <Spinner
+            android:id="@+id/spinner_loc"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:paddingStart="15dp"
+            android:spinnerMode="dialog"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/txt_request_region"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Request Region"
+        android:padding="5dp"
+        android:textStyle="bold"
+        android:textColor="#2196f3"
+        app:layout_constraintTop_toBottomOf="@id/constraintLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="15dp"/>
+
+    <CheckBox
+        android:id="@+id/chk_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:checked="false"
+        android:button="@drawable/square_radio_bg"
+        android:paddingStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:text="Do you want to add estimated completion date?"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/constraintLayout"
+        app:layout_constraintTop_toBottomOf="@+id/txt_request_region" />
+
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintTop_toBottomOf="@id/chk_date"
+        app:layout_constraintStart_toStartOf="@id/chk_date"
+        app:layout_constraintEnd_toEndOf="@id/chk_date"
+        android:visibility="gone"
+        />
+    <CheckBox
+        android:id="@+id/chk_CRRE"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:button="@drawable/square_radio_bg"
+        android:paddingStart="10dp"
+        android:layout_marginTop="10dp"
+        android:text="Do you want to assign the product directly to Master CRRE?"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintStart_toStartOf="@+id/chk_date"
+        app:layout_constraintTop_toBottomOf="@+id/date" />
+    <LinearLayout
+        android:id="@+id/layout_crreSelection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="10dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/chk_CRRE">
+        <RadioGroup
+            android:id="@+id/rdGroup_crre"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <RadioButton
+                android:id="@+id/rd_master"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Assign Master CRRE"/>
+            <RadioButton
+                android:id="@+id/rd_registration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Assign Registration Expert"/>
+        </RadioGroup>
+
+
+<LinearLayout
+    android:id="@+id/layout_spinner"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:background="@drawable/shape_oval"
+    android:layout_marginTop="5dp"
+    android:layout_marginStart="30dp"
+    android:layout_marginEnd="15dp"
+    android:visibility="gone">
+            <Spinner
+                android:id="@+id/spinner_crre"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingStart="15dp"
+                android:layout_marginStart="10dp"
+                android:spinnerMode="dialog"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+</LinearLayout>
+
+    </LinearLayout>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/layout_crreSelection"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="50dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/submit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elevation="5dp"
+            app:cardCornerRadius="5dp"
+            app:cardBackgroundColor="@color/text_orange"
+            app:layout_constraintEnd_toStartOf="@+id/guideline2"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginEnd="10dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:text="Submit For Bidding"
+                android:padding="5dp"/>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline2"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent=".6" />
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cancel_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elevation="5dp"
+            app:cardCornerRadius="5dp"
+            app:cardBackgroundColor="@android:color/holo_red_dark"
+            app:layout_constraintStart_toEndOf="@+id/submit"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginStart="10dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:text="Cancel"
+                android:padding="5dp"/>
+        </androidx.cardview.widget.CardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

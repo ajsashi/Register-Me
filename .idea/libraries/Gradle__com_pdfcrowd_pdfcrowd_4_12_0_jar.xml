@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Gradle: com.pdfcrowd:pdfcrowd:4.12.0@jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.pdfcrowd/pdfcrowd/4.12.0/84ece684336eedb99e6dada01adacac6c9821131/pdfcrowd-4.12.0.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.pdfcrowd/pdfcrowd/4.12.0/827ccbc96ef99f1aebd100f53f7dc086d4737339/pdfcrowd-4.12.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.pdfcrowd/pdfcrowd/4.12.0/201ed6c2f310f67210bc373cd620524d7725790a/pdfcrowd-4.12.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

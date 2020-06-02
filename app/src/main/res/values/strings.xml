@@ -1,0 +1,190 @@
+<resources>
+    <string name="app_name">Register Me</string>
+    <string name="any_username">Any username</string>
+    <string name="any_password">Any password</string>
+    <string name="login">Login</string>
+    <string name="field_cannot_be_empty">Field cannot be empty</string>
+    <string name="welcome">WELCOME</string>
+    <string name="lets_get_started">Let\'s get started!</string>
+    <string name="profile">Profile</string>
+    <string name="change_password">Change Password</string>
+    <string name="notification">Notification</string>
+    <string name="logout">Logout</string>
+    <string name="client_dashboard">CLIENT DASHBOARD</string>
+    <string name="awarded_prod_dash">PRODUCT DASHBOARD</string>
+    <string name="add_product">ADD PRODUCT</string>
+    <string name="product_registration">PRODUCT REGISTRATION</string>
+    <string name="product_number">Product Number</string>
+    <string name="product_name">Product Name</string>
+    <string name="view_product">VIEW PRODUCT</string>
+    <string name="product_description">Product Description</string>
+    <string name="crre_direct">CRRE Direct Assignment</string>
+    <string name="country">COUNTRY DASHBOARD</string>
+    <string name="product_details">PRODUCT DETAILS</string>
+    <string name="add_new_product">Add New Product</string>
+    <string name="product_classification">Product Classification</string>
+    <string name="is_it_idv">Is it IVD?</string>
+    <string name="is_it_life_supporting_life_sustaining">Is it life supporting / life sustaining?</string>
+    <string name="any_direct_or_indirect_patients_contacting_components">Any direct or indirect patients contacting components?</string>
+    <string name="if_yes_is_it_implant">If yes, is it implant?</string>
+    <string name="does_the_product_use_software_firmware">Does the product use software and / or firmware?</string>
+    <string name="if_yes_does_it_contains_digital_health_technology">If yes, does it contains digital health technology?</string>
+    <string name="connection_type">Connection Type</string>
+    <string name="wireless_communication_in_any_form">Wireless communication in any form</string>
+    <string name="does_the_product_need_sterlization">Does the product need sterilization?</string>
+    <string name="sterilization_type">Sterilization Type</string>
+    <string name="intended_population">Intended Population</string>
+    <string name="is_this_a_combination_product">Is this a combination product?</string>
+    <string name="indications_for_use">Indications for Use</string>
+    <string name="device_type">Device Type</string>
+    <string name="electrical_product_type">Electrical Product Type</string>
+    <string name="usage_environment">Usage Environment</string>
+    <string name="does_the_device_emit_radiation">Does the device emit radiation?</string>
+    <string name="is_the_product_electrical">Is the product electrical?</string>
+    <string name="will_the_device_be_reprocessed_for_resale">Will the device be reprocessed for resale?</string>
+    <string name="is_the_device_for_pediatric_use">Is the device for pediatric use?</string>
+    <string name="do_you_have_substance_of_biological_origin_in_your_device">Do you have substance of biological origin in your device?</string>
+    <string name="products_details">Product Details</string>
+    <string name="initiate_product_registration">Initiate Product Registration</string>
+
+    <string-array name="country_name">
+        <item>Select Country</item>
+        <item>US</item>
+        <item>India</item>
+        <item>Australia</item>
+    </string-array>
+
+    <string-array name="select_role">
+        <item>Select Role</item>
+        <item>Client</item>
+        <item>RRE</item>
+    </string-array>
+
+    <string-array name="classification_type">
+        <item>Class I</item>
+        <item>Class II</item>
+        <item>Class III</item>
+        <item>Combination</item>
+    </string-array>
+
+    <string-array name="connection_type">
+        <item>Cloud Communication</item>
+        <item>Network connection (active or not)</item>
+        <item>Wireless communication in any form</item>
+        <item>USB/ serial ports/ removable media</item>
+        <item>Software upgrades (this includes patches)</item>
+        <item>None of the above (no Cybersecurity needed)</item>
+    </string-array>
+
+
+    <string-array name="indication">
+        <item>Prescription (Rx)</item>
+        <item>Over-the-Counter (OTC) or</item>
+        <item>Both Rx and OTC</item>
+    </string-array>
+
+
+    <string-array name="intended_population">
+        <item>Adults (greater than 21 years of age)</item>
+        <item>Neonate/Newborn (Birth through 28 days)</item>
+        <item>Infant (29 days to 2 years of age)</item>
+        <item>Child (from 2 years to 12 years of age)</item>
+        <item>Adolescent (from 12 years to 18 years of age)</item>
+        <item>Transitional Adolescent A (18 through 21 years of age, special considerations given, different from adults)</item>
+        <item>Transitional Adolescent B (18 through 21 years of age, no special considerations given when compared to adults)</item>
+    </string-array>
+
+
+    <string-array name="device_type">
+        <item>A single use device(s), non-sterile or packaged as sterilize before use</item>
+        <item>A single use device(s), terminal/ end user sterilized</item>
+        <item>A reusable single patient use device(s)</item>
+        <item>A reusable multi-patient use device(s) Please identify the device(s), and/or accessory(ies), and/or components(s) that are reusable</item>
+    </string-array>
+
+    <string-array name="usage_env">
+        <item>Professional Health Care</item>
+        <item>Home Environment</item>
+        <item>Magnetic Resonance Environment</item>
+        <item>Transport or Ambulatory</item>
+        <item>Other</item>
+    </string-array>
+
+
+    <string-array name="sterile">
+        <item>ETO</item>
+        <item>Gamma</item>
+        <item>E-beam</item>
+        <item>Heat – dry</item>
+        <item>Heat – moist</item>
+        <item>Other</item>
+    </string-array>
+
+    <string-array name="battery">
+        <item>Battery</item>
+        <item>Wall Powered</item>
+    </string-array>
+
+    <string-array name="pro_connection_type">
+        <item>Cloud</item>
+        <item>Network</item>
+        <item>Wireless</item>
+        <item>Removable media</item>
+    </string-array>
+    <string-array name="product_type">
+        <item>Reusable Single-Use Product</item>
+        <item>Reusable Multi-Patient Product</item>
+        <item>Single-Use Disposable</item>
+    </string-array>
+
+    <string-array name="currency">
+        <item>Select</item>
+        <item>USD</item>
+        <item>BRL</item>
+        <item>CNY</item>
+        <item>INR</item>
+        <item>HKD</item>
+    </string-array>
+
+    <string-array name="DMY">
+        <item>Days</item>
+        <item>Month</item>
+        <item>Year</item>
+    </string-array>
+    <!-- <string-array name="mime_types">
+        <item>application/pdf</item>
+        <item>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</item>
+        <item>application/vnd.openxmlformats-officedocument.presentationml.presentation</item>
+        <item>application/vnd.openxmlformats-officedocument.wordprocessingml.document</item>
+        <item>application/vnd.ms-excel</item>
+    </string-array>-->
+
+    <string name="rre_dashboard">REGULATORY EXPERT APPLICATION</string>
+    <string name="network_alert">Please check your network connection</string>
+    <string name="empty_email_alert">Please enter your email address</string>
+    <string name="empty_password_alert">Please enter your password</string>
+    <string name="valid_email_alert">Please enter a valid email address</string>
+    <string name="password_alert"><![CDATA[Password must contain upper,lower case letters, digits and one special character(>6)]]></string>
+    <string name="profile_details">PROFILE DETAILS</string>
+    <string name="user_info">User Profile Information</string>
+    <string name="Is_the_device_life_supporting">Is the device life supporting or life sustaining?</string>
+    <string name="Is_the_device_or_component_an_implant">Is the device life supporting or life sustaining?</string>
+    <string name="are_there_any_direct_or_indirect_patient_contacting_components">Are there any direct or indirect patient contacting components?</string>
+    <string name="is_the_device_digital_health_technology_or_does_it_contain_digital_health_technology">Is the device digital health technology, or does it contain digital health technology?</string>
+    <string name="does_the_device_use_software_firmware">Does the device use software/firmware?</string>
+    <string name="select_the_type_of_sterile_processing">Select the type of sterile processing</string>
+    <string name="does_the_device_or_a_component_need_sterilization_by_the_manufacturer_or_user">Does the device or a component need sterilization (by the manufacturer or user) ?</string>
+    <string name="select_electrical_device_type">Select Electrical Device Type</string>
+    <string name="avatar_update_failed">Profile Image update Failed</string>
+    <string name="update_product">Update Product</string>
+    <string name="direct_master_crre_assignment">Do you want to assign the product directly to Master CRRE?</string>
+    <string name="direct_master_crre_registration_expert_assignment">Do you want to assign the product directly to Master CRRE/ Registration Expert?</string>
+    <string name="edit_icon_alert">Please click edit icon to update profile info</string>
+    <string name="home">Home</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="application_policy_training">Application &amp; Policy Training</string>
+
+    <item type="id" name="index" />
+    <item type="id" name="usecase" />
+
+</resources>

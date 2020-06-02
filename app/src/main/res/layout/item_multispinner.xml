@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/textSpinnerTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:text="Product Classification"
+        android:layout_marginStart="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_classify"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/shape_oval"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/textSpinnerTitle"
+        app:layout_constraintTop_toBottomOf="@+id/textSpinnerTitle"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+
+        <com.thomashaertel.widget.MultiSpinner
+            android:id="@+id/spinnerMulti"
+            android:layout_width="match_parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_height="40dp"
+            android:spinnerMode="dropdown"
+            android:paddingStart="15dp"
+            />
+
+        <TextView
+            android:id="@+id/spinner_text"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:gravity="center_vertical"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="50dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"
+            android:maxLines="1"
+            android:text="Selectsdfasdfjpiom  sdfmoisdjf smdfiosdj lskdmfoisdj lsdmfosdij skdmiodj aslkdfioj sdlfiojlkasdfoij asdfmsdkfjioasdmfsdlkmfoijdfkmndoifj"
+
+            android:visibility="visible"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+<!--
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/shape_oval">
+
+</LinearLayout>-->

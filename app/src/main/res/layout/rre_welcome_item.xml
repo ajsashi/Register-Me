@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:id="@+id/item">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/view_bg_rre_item"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text=" Application Submission "
+            android:textSize="16sp"
+            android:textColor="@color/orange"
+            android:textStyle="bold"
+            android:layout_marginStart="60dp"
+            android:layout_marginEnd="15dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <!--<View
+            android:layout_width="5dp"
+            android:layout_height="0dp"
+            android:background="@color/darker_gray_color"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/imageView5"
+            app:layout_constraintStart_toStartOf="@+id/imageView5"
+            app:layout_constraintTop_toBottomOf="@id/imageView5" />-->
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:id="@+id/top_line"
+        android:layout_width="5dp"
+        android:layout_height="0dp"
+        android:background="#e4e4e4"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/image_btn"
+        app:layout_constraintEnd_toEndOf="@+id/image_btn"
+        app:layout_constraintStart_toStartOf="@+id/image_btn"/>
+
+    <View
+        android:id="@+id/bottom_line"
+        android:layout_width="5dp"
+        android:layout_height="0dp"
+        android:background="#e4e4e4"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/image_btn"
+        app:layout_constraintStart_toStartOf="@+id/image_btn"
+        app:layout_constraintTop_toBottomOf="@+id/image_btn" />
+
+    <ImageView
+        android:id="@+id/image_btn"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/btn_grey" />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

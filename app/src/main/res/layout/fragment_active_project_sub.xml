@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginStart="15dp"
+    android:layout_marginEnd="15dp"
+    android:layout_marginBottom="15dp"
+    android:background="@color/white">
+    <TextView
+        android:id="@+id/sub_header"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/black"
+        android:gravity="center_vertical"
+        android:paddingLeft="20dp"
+        android:text="@string/initiate_product_registration"
+        android:textAllCaps="true"
+        android:textColor="@color/white"
+        app:layout_constraintTop_toTopOf="parent" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:orientation="horizontal"
+        android:background="@drawable/shape_orange_bg"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginTop="10dp"
+        >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Product Number"
+            android:paddingStart="5dp"
+            android:textColor="@color/text_orange"
+            android:layout_weight="1"
+            />
+
+        <TextView
+            android:id="@+id/txt_RegClient"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Registration Expert"
+            android:layout_weight="1"
+            android:textColor="@color/text_orange"
+            />
+        <TextView
+            android:id="@+id/txtBid_country"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Bid Amount"
+            android:textColor="@color/text_orange"
+            android:layout_weight="1"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/pLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="10dp">
+    <include
+        layout="@layout/layout_progress_bar"/>
+    </LinearLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/active_recycleview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="10dp"
+        tools:listitem="@layout/project_item"
+        android:visibility="visible"/>
+
+    <LinearLayout
+        android:id="@+id/no_content_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
+        <TextView
+            android:id="@+id/noContentText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="No Auctions in Progress!"
+            android:gravity="center"
+            android:textSize="25sp"/>
+    </LinearLayout>
+
+</LinearLayout>

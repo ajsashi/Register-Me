@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Gradle: com.convertapi.client:convertapi:2.2@jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.convertapi.client/convertapi/2.2/eec52e1876abb7fd0194f3833c88f0016f8f8b0d/convertapi-2.2.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.convertapi.client/convertapi/2.2/a679a332176f8e8cedc57e600c46cc32a7905f46/convertapi-2.2-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.convertapi.client/convertapi/2.2/c61a8aa76ec86a27973b24db3a9f0bb4669e2838/convertapi-2.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
