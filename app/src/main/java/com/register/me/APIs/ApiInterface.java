@@ -5,10 +5,13 @@ import com.register.me.model.data.model.ActiveAuction;
 import com.register.me.model.data.model.ActiveCompProject;
 import com.register.me.model.data.model.AddProductModel;
 import com.register.me.model.data.model.ApplicationRRESubmission;
+import com.register.me.model.data.model.AuctionWon;
 import com.register.me.model.data.model.AvatarModel;
 import com.register.me.model.data.model.CRREResponse;
 import com.register.me.model.data.model.CertificateStatus;
+import com.register.me.model.data.model.CertifiedRREList;
 import com.register.me.model.data.model.ChangePasswordModel;
+import com.register.me.model.data.model.ChargeTokenResponse;
 import com.register.me.model.data.model.Client;
 import com.register.me.model.data.model.ClientProductList;
 import com.register.me.model.data.model.CrreList;
@@ -22,6 +25,8 @@ import com.register.me.model.data.model.LocationModel;
 import com.register.me.model.data.model.LoginModel;
 import com.register.me.model.data.model.LogoutModel;
 import com.register.me.model.data.model.MasterDash;
+import com.register.me.model.data.model.McrreList;
+import com.register.me.model.data.model.McrreProductDetails;
 import com.register.me.model.data.model.MyActiveAuction;
 import com.register.me.model.data.model.MyAuctionInProgress;
 import com.register.me.model.data.model.PolicyTraining;
@@ -56,6 +61,7 @@ import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Query;
 import retrofit2.http.QueryMap;
 import retrofit2.http.Url;
@@ -103,7 +109,7 @@ public interface ApiInterface {
                                      @Body JsonObject data);
 
 
-    @POST("product")
+    @PUT("product")
     Call<AddProductModel> editProduct(@Header("Authorization") String token,
                                       @Query("productid") int id,
                                       @Body JsonObject data);
@@ -238,6 +244,7 @@ public interface ApiInterface {
     Observable<Response<CRREResponse>> crreUploadFiles(@Header("Authorization") String token,
                                                        @Body JsonObject jsonObject);
 
+    /*************************************************     MASTER CRRE PROCESS    ****************************************/
     @GET("mcrdashboard")
     Observable<Response<MasterDash>> getMasterDashboard(@Header("Authorization") String token);
 
@@ -247,6 +254,8 @@ public interface ApiInterface {
     @GET("mcrrredetails")
     Observable<Response<RRE>> getRREDetails(@Header("Authorization") String token);
 
+    @GET("mcrcertifieddetails")
+    Observable<Response<CertifiedRREList>> getCrreDetails(@Header("Authorization") String token);
     @POST("mcruserinfo")
     Observable<Response<UserInfo>> getUserInfo(@Header("Authorization") String token,
                                                @Body JsonObject jsonObject);
@@ -259,9 +268,10 @@ public interface ApiInterface {
     Observable<Response<ResponseData>> approveApplication(@Header("Authorization") String token,
                                                           @Query("id") String id);
 
-    @GET("mcrinterviewapprove")
+    @POST("mcrinterviewapprove")
     Observable<Response<ResponseData>> approveInterview(@Header("Authorization") String token,
                                                         @Body JsonObject jsonObject);
+
 
     @GET("mcrtrainingapprove")
     Observable<Response<ResponseData>> approveTraining(@Header("Authorization") String token,
@@ -312,4 +322,43 @@ public interface ApiInterface {
     Observable<Response<ResponseData>> acceptRequestedRegion(@Header("Authorization") String token,
                                                              @Query("id") String id);
 
+    @POST("mcrregioncancel")
+    Observable<Response<ResponseData>> cancelRequestedRegion(@Header("Authorization") String token, @Body JsonObject object);
+
+    @GET("mcrredetails")
+    Observable<Response<McrreList>> getMcrreList(@Header("Authorization") String token);
+
+    @POST("mcrregionedit")
+    Observable<Response<ResponseData>> editGeoRegion(@Header("Authorization") String token, @Body JsonObject object);
+
+    @GET("mcrremoveregion")
+    Observable<Response<ResponseData>> removeGeoRegion(@Header("Authorization") String token, @Query("id") String id);
+
+    @GET("location")
+    Observable<Response<LocationModel>> getMasterLocation(@Header("Authorization") String token);
+
+    @GET("mcrproductview")
+    Observable<Response<ViewDetails>> getMcrreProductDetails(@Header("Authorization") String token, @Query("productid") String producID);
+
+    @GET("mcrrreviewapplication")
+    Observable<Response<RREApplication>> getDocCommentsList(@Header("Authorization") String token, @Query("id") String producID);
+
+    @POST("mcrnewregion")
+    Observable<Response<ResponseData>> addNewGeoLocation(@Header("Authorization") String token, @Query("region") String producID);
+
+    @POST("mcrrrepostreplymail")
+    Observable<Response<ResponseData>> mcrrePostReply(@Header("Authorization") String token, @Body JsonObject object);
+
+    @GET("mcrauctionwon")
+    Observable<Response<AuctionWon>> getAuctionsWon(@Header("Authorization") String token);
+
+    @FormUrlEncoded
+    @POST("v1/charges")
+    Observable<Response<ChargeTokenResponse>> chargeToken(
+            @Header("Authorization") String apiToken,
+            @Field("amount") String amount,
+            @Field("currency") String currency,
+            @Field("description") String description,
+            @Field("source") String source
+    );
 }

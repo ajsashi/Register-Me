@@ -19,7 +19,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
-import com.onurkaganaldemir.ktoastlib.KToast;
+
 import com.register.me.R;
 import com.register.me.model.data.model.CrreList;
 import com.register.me.model.data.model.KeyValue;
@@ -32,6 +32,7 @@ import com.register.me.view.fragmentmanager.manager.IFragment;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -80,6 +81,8 @@ public class InitiateRegistrationFragment extends BaseFragment implements IFragm
     private boolean isDateEnabled;
     private List<CrreList.Expertlist> cList;
     private SpinAdapter<CrreList.Expertlist> crreAdapter;
+    @Inject
+    Utils utils;
 
 
     @Override
@@ -121,6 +124,8 @@ public class InitiateRegistrationFragment extends BaseFragment implements IFragm
 
             }
         });
+
+
 
 
         date.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -236,7 +241,9 @@ public class InitiateRegistrationFragment extends BaseFragment implements IFragm
 
     @Override
     public void showMessage(String msg) {
-        KToast.customColorToast((Activity) getContext(), msg, Gravity.BOTTOM, KToast.LENGTH_SHORT, R.color.red);
+        if(msg!=null) {
+            utils.showToastMessage(getContext(), msg);
+        }
     }
 
     @Override

@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -21,21 +20,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.gson.JsonObject;
-import com.onurkaganaldemir.ktoastlib.KToast;
 import com.register.me.APIs.RRENetworkCall;
 import com.register.me.R;
 import com.register.me.model.data.model.ApplicationRRESubmission;
 import com.register.me.model.data.model.QandA;
-import com.register.me.model.data.model.RREApplication;
 import com.register.me.model.data.util.Utils;
 import com.register.me.presenter.AddProductPresenter;
 import com.register.me.view.BaseActivity;
 import com.register.me.view.BaseFragment;
 import com.register.me.view.HomeActivity;
-import com.register.me.view.activity.WelcomeActivity;
 import com.register.me.view.fragmentmanager.manager.IFragment;
 import com.thomashaertel.widget.MultiSpinner;
 
@@ -62,11 +59,16 @@ public class AddProductFragment extends BaseFragment implements IFragment, AddPr
     @Inject
     AddProductPresenter addProductPresenter;
     private List<QandA> questList;
-
+    @BindView(R.id.progressBar)
+    ConstraintLayout progressBar;
+    @BindView(R.id.progressbar)
+    ConstraintLayout progressLayout;
     @BindView(R.id.txtBtn)
     TextView addEditBtn;
     @BindView(R.id.sub_header)
     TextView subHeader;
+    @BindView(R.id.card_add)
+    CardView add;
     @BindView(R.id.product_container)
     LinearLayout container;
     private String mTrue = "true";
@@ -76,28 +78,7 @@ public class AddProductFragment extends BaseFragment implements IFragment, AddPr
     private List<EditText> editList;
     @Inject
     RRENetworkCall rreNetworkCall;
-    /*private Observer<RREApplication> applicationObserver = new Observer<RREApplication>() {
-        @Override
-        public void onSubscribe(Disposable d) {
 
-        }
-
-        @Override
-        public void onNext(RREApplication rreApplication) {
-            questList = addProductPresenter.getRREApplication(rreApplication);
-            buildUI();
-        }
-
-        @Override
-        public void onError(Throwable e) {
-
-        }
-
-        @Override
-        public void onComplete() {
-
-        }
-    };*/
     private Observer<String> message = new Observer<String>() {
         @Override
         public void onSubscribe(Disposable d) {
@@ -105,7 +86,10 @@ public class AddProductFragment extends BaseFragment implements IFragment, AddPr
 
         @Override
         public void onNext(String s) {
-            Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();
+            dismissProgress();
+            if (utils.isOnline(getContext())) {
+                Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();
+            }
             rreNetworkCall.clearDisposable();
         }
 
@@ -120,6 +104,8 @@ public class AddProductFragment extends BaseFragment implements IFragment, AddPr
         }
     };
     private Observer<ApplicationRRESubmission> submitObserver;
+    @Inject
+    Utils utils;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -130,7 +116,9 @@ public class AddProductFragment extends BaseFragment implements IFragment, AddPr
         addProductPresenter.init(context, this);
         ((Activity) context).getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         editList = new ArrayList<>();
-        fragmentChannel.setTitle(getResources().getString(R.string.add_product));
+        if (addProductPresenter.getRole() != 1) {
+            fragmentChannel.setTitle(getResources().getString(R.string.add_product));
+        }
 
     }
 
@@ -148,12 +136,12 @@ public class AddProductFragment extends BaseFragment implements IFragment, AddPr
             String lable = addProductPresenter.getLable();
             addEditBtn.setText(lable);
             fragmentChannel.setTitle(lable.toUpperCase());
-        } else if (addProductPresenter.getRole() == 1) {
+        } /*else if (addProductPresenter.getRole() == 1) {
             subHeader.setVisibility(View.GONE);
 //            rreNetworkCall.viewRREApplication(applicationObserver);
             questList = addProductPresenter.getRREApplication();
             addEditBtn.setText("SUBMIT");
-        }
+        }*/
         if (questList != null) {
             buildUI();
         }
@@ -308,8 +296,8 @@ public class AddProductFragment extends BaseFragment implements IFragment, AddPr
                 if (id == R.id.rdValue_yes) {
                     sub.setVisibility(View.VISIBLE);
                     questList.get(finalI13).setAnswer(mTrue);
-                   /* subNo.setChecked(true);
-                    questList.get(finalI13).getSubQA().setAnswer(mFalse);*/
+                    subNo.setChecked(true);
+                   /* questList.get(finalI13).getSubQA().setAnswer(mFalse);*/
                 } else {
                     sub.setVisibility(View.GONE);
                     questList.get(finalI13).setAnswer(mFalse);
@@ -461,6 +449,7 @@ public class AddProductFragment extends BaseFragment implements IFragment, AddPr
         TextView txtQuest = inflateView.findViewById(R.id.itemTxtTitle);
         EditText txtAns = inflateView.findViewById(R.id.itemEditValue);
         txtQuest.setText(item.getQuestion());
+        txtAns.setHint(item.getQuestion());
         txtAns.setText(item.getAnswer());
 //        txtAns.setText("Besides finding the source of the issue, I found the solution. If android:inputType is used, then textMultiLine must be used to enable multi-line support");
         int inputType = item.getInputType();
@@ -530,6 +519,10 @@ public class AddProductFragment extends BaseFragment implements IFragment, AddPr
 
             if (list.size() != 0) {
                 String answer = addProductPresenter.getStringList(list);
+                QandA pos = questList.get(finalI);
+                if (pos.getAnswer() == null) {
+                    pos.setAnswer("true");
+                }
                 if (questList.get(finalI).getSubQA() != null) {
                     questList.get(finalI).getSubQA().setAnswer(answer);
                 } else {
@@ -548,6 +541,8 @@ public class AddProductFragment extends BaseFragment implements IFragment, AddPr
 
     @OnClick(R.id.card_add)
     public void onClickAdd() {
+        add.setEnabled(false);
+        showProgress();
         addProductPresenter.validateAnswers(questList);
     }
 
@@ -574,14 +569,17 @@ public class AddProductFragment extends BaseFragment implements IFragment, AddPr
 
     @Override
     public void showErrorMessage(String message) {
+        dismissProgress();
+        add.setEnabled(true);
         if (message.toLowerCase().contains("success")) {
             ((BaseActivity) context).onBackPressed();
         }
-        KToast.customColorToast((Activity) context, message, Gravity.BOTTOM, KToast.LENGTH_AUTO, R.color.red);
+        utils.showToastMessage(getContext(), message);
     }
 
     @Override
     public void triggerApi(JsonObject data) {
+dismissProgress();
         submitObserver = new Observer<ApplicationRRESubmission>() {
             @Override
             public void onSubscribe(Disposable d) {
@@ -590,6 +588,7 @@ public class AddProductFragment extends BaseFragment implements IFragment, AddPr
 
             @Override
             public void onNext(ApplicationRRESubmission applicationRRESubmission) {
+                dismissProgress();
                 Toast.makeText(context, applicationRRESubmission.getData().getMessage(), Toast.LENGTH_SHORT).show();
                 rreNetworkCall.clearDisposable();
             }
@@ -604,17 +603,43 @@ public class AddProductFragment extends BaseFragment implements IFragment, AddPr
 
             }
         };
-        rreNetworkCall.submitRREApplication(data,submitObserver);
+        showProgress();
+        add.setEnabled(true);
+        rreNetworkCall.submitRREApplication(data, submitObserver);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        rreNetworkCall.init(getContext(),message,this);
+        if (addProductPresenter.getRole() == 1) {
+            subHeader.setVisibility(View.GONE);
+//            rreNetworkCall.viewRREApplication(applicationObserver);
+            questList = addProductPresenter.getRREApplication();
+            addEditBtn.setText("SUBMIT");
+            if (questList != null) {
+                buildUI();
+            }
+        }
+
+        rreNetworkCall.init(getContext(), message, this);
     }
 
     @Override
     public void refreshNetwork() {
-        rreNetworkCall.checkNetStatus();
+        if(rreNetworkCall.checkNetStatus())
+        {
+            dismissProgress();
+            onResume();
+        }
+    }
+
+    private void showProgress() {
+        progressBar.setVisibility(View.VISIBLE);
+        progressLayout.setVisibility(View.VISIBLE);
+    }
+
+    private void dismissProgress() {
+        progressBar.setVisibility(View.GONE);
+        progressLayout.setVisibility(View.GONE);
     }
 }

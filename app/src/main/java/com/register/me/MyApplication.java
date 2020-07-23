@@ -14,13 +14,14 @@ import com.register.me.model.di.app.DaggerApplicationComponent;
 import com.register.me.view.BaseActivity;
 import com.register.me.util.CrashlyticsUtil;
 import com.crashlytics.android.Crashlytics;
+import com.stripe.android.PaymentConfiguration;
 
-import io.fabric.sdk.android.Fabric;
+
 import timber.log.Timber;
 
 
 public class MyApplication extends Application {
-
+    String STRIPE_PUBLISHABLE_KEY="pk_test_TpwrHuchKh4oBpynQaTPUMe100tCs1Q85c";
     private ApplicationComponent component;
 
     @Override
@@ -33,18 +34,20 @@ public class MyApplication extends Application {
         }
         LeakCanary.install(this);*/
 
-        Fabric.with(this, new Crashlytics());
+//        Fabric.with(this, new Crashlytics());
 
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         } else {
-            Timber.plant(new CrashReportingTree());
+//            Timber.plant(new CrashReportingTree());
         }
 
         component = DaggerApplicationComponent.builder()
                 .applicationModule(new ApplicationModule(this))
                 .androidModule(new AndroidModule(this))
                 .build();
+
+        PaymentConfiguration.init(getApplicationContext(),STRIPE_PUBLISHABLE_KEY);
     }
 
     public ActivityComponent getActivityComponent(BaseActivity baseActivity) {

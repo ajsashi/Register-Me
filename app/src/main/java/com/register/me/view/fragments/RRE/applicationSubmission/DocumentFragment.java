@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Base64OutputStream;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -68,6 +69,8 @@ public class DocumentFragment extends BaseFragment implements IFragment, Documen
     ConstraintLayout layPbar;
     @BindView(R.id.progressbar)
     ConstraintLayout progressBar;
+    @BindView(R.id.noContentText)
+    TextView noContentLayout;
     @Inject
     DocumentPresenter presenter;
     @Inject
@@ -114,17 +117,21 @@ public class DocumentFragment extends BaseFragment implements IFragment, Documen
 
             @Override
             public void onNext(String s) {
-                Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();
+                Log.d("doc OkHttp -------", s);
+                dismissProgress();
+                if (utils.isOnline(getContext())) {
+                    Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
             public void onError(Throwable e) {
-
+                Log.d("Error", e.getLocalizedMessage());
             }
 
             @Override
             public void onComplete() {
-
+                Log.d("onComplete", "");
             }
         };
         uploadDocObserver = new Observer<UploadDoc>() {
@@ -135,15 +142,17 @@ public class DocumentFragment extends BaseFragment implements IFragment, Documen
 
             @Override
             public void onNext(UploadDoc uploadDoc) {
-
+                rreNetworkCall.clearDisposable();
+                dismissProgress();
                 String message = uploadDoc.getData().getMessage();
                 Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                showProgress();
                 rreNetworkCall.viewRREApplication(applicationObserver);
             }
 
             @Override
             public void onError(Throwable e) {
-
+                Log.d("onError", e.getLocalizedMessage());
             }
 
             @Override
@@ -161,13 +170,14 @@ public class DocumentFragment extends BaseFragment implements IFragment, Documen
             @Override
             public void onNext(RREApplication rreApplication) {
                 dismissProgress();
+                rreNetworkCall.clearDisposable();
                 presenter.setDocumentList(rreApplication.getData().getDocument());
                 buildRREFiles();
             }
 
             @Override
             public void onError(Throwable e) {
-
+                Log.d("onError", e.getLocalizedMessage());
             }
 
             @Override
@@ -186,12 +196,12 @@ public class DocumentFragment extends BaseFragment implements IFragment, Documen
             public void onNext(Response<LibraryFiles> libraryFilesResponse) {
                 dismissProgress();
                 buildCRREFiles(libraryFilesResponse.body().getData().getMyLibraryfiles());
-                Toast.makeText(getContext(), libraryFilesResponse.body().getStatusCode() + "", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getContext(), libraryFilesResponse.body().getStatusCode() + "", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onError(Throwable e) {
-
+                Log.d("onError", e.getLocalizedMessage());
             }
 
             @Override
@@ -240,7 +250,7 @@ public class DocumentFragment extends BaseFragment implements IFragment, Documen
 
             @Override
             public void onError(Throwable e) {
-
+                Log.d("onError", e.getLocalizedMessage());
             }
 
             @Override
@@ -263,6 +273,7 @@ public class DocumentFragment extends BaseFragment implements IFragment, Documen
 
         token = presenter.getToken();
         if (presenter.getRole() == 1) {
+            dismissProgress();
             buildRREFiles();
         } else {
             crreNetworkCall.getFiles(locationId, fileObserver);
@@ -271,8 +282,10 @@ public class DocumentFragment extends BaseFragment implements IFragment, Documen
 
     private void buildRREFiles() {
         List<RREApplication.Document> document = presenter.getDocuments();
-        if (document.size() != 0) {
+        if (document != null && document.size() != 0) {
             documentContainer.removeAllViews();
+            documentContainer.setVisibility(View.VISIBLE);
+            noContentLayout.setVisibility(View.GONE);
             for (RREApplication.Document doc : document) {
                 View view1 = LayoutInflater.from(getContext()).inflate(R.layout.document_item, documentContainer, false);
                 TextView docName = view1.findViewById(R.id.docName);
@@ -299,16 +312,19 @@ public class DocumentFragment extends BaseFragment implements IFragment, Documen
                     startActivity(i);
                 });
                 delete.setOnClickListener(v -> {
+                    utils.showAlert(getContext(), 16, this::alertResponse);
                     json = presenter.getDeleteJson(doc);
 
                 });
                 documentContainer.addView(view1);
             }
-        } else {
-            int childCount = documentContainer.getChildCount();
+        } else if (document.size() == 0) {
+            documentContainer.setVisibility(View.GONE);
+            noContentLayout.setVisibility(View.VISIBLE);
+            /*int childCount = documentContainer.getChildCount();
             if (document.size() == 0 && childCount > 0) {
                 documentContainer.removeAllViews();
-            }
+            }*/
         }
     }
 
@@ -324,8 +340,12 @@ public class DocumentFragment extends BaseFragment implements IFragment, Documen
                 ImageView delete = view1.findViewById(R.id.delete);
 
                 String docUrl = doc.getFilename();
+
                 String fileName = presenter.getFileName(docUrl);
                 String extension = presenter.getExtension();
+                if (extension.isEmpty()) {
+                    fileName = docUrl;
+                }
                 Drawable res = null;
                 try {
                     String uri = "@drawable/" + extension;
@@ -400,12 +420,16 @@ public class DocumentFragment extends BaseFragment implements IFragment, Documen
             File f = fileUtil.getFile(getContext(), uri);
 
             try {
-                String data64 = getStringFile(f);
                 String fileName = fileUtil.getFileName(getContext(), uri);
+                if (fileName.contains("mp4") || fileName.contains("mp3")) {
+                    Toast.makeText(getContext(), "File format is not supported or File may be corrupted", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                String data64 = getStringFile(f);
                 int pos = fileName.lastIndexOf(".");
                 fileName = fileName.substring(0, pos);
-                String extension = fileUtil.getExtension(uri.getPath());
-                if(extension.isEmpty()||extension.equals("tif")||extension.equals("tiff")){
+                String extension = fileUtil.getExtension(f.getPath());
+                if (extension.isEmpty() || extension.equals("tif") || extension.equals("tiff")) {
                     Toast.makeText(getContext(), "File format is not supported or File may be corrupted", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -422,7 +446,7 @@ public class DocumentFragment extends BaseFragment implements IFragment, Documen
                     dataList.add(new QandA("action", action, 0, 0, 0, "", null, null));
                     JsonObject json = presenter.getDocJson(dataList);
                     showProgress();
-                    rreNetworkCall.uploadDocument(token, json, uploadDocObserver);
+                    rreNetworkCall.uploadDocument(getContext(), message, this, token, json, uploadDocObserver);
                 } else {
                     ArrayList<QandA> dataList = new ArrayList<>();
                     dataList.add(new QandA("data", data64, 0, 0, 0, "", null, null));
@@ -477,7 +501,8 @@ public class DocumentFragment extends BaseFragment implements IFragment, Documen
 
     @Override
     public void refreshNetwork() {
-        rreNetworkCall.checkNetStatus();
+        dismissProgress();
+       rreNetworkCall.checkNetStatus();
     }
 
     @Override
@@ -494,9 +519,17 @@ public class DocumentFragment extends BaseFragment implements IFragment, Documen
 
     private void triggerDelete() {
         if (role == 1) {
-            rreNetworkCall.uploadDocument(token, json, uploadDocObserver);
+            rreNetworkCall.uploadDocument(getContext(), message, this, token, json, uploadDocObserver);
         } else if (role == 2) {
             crreNetworkCall.deleteFile(json, deleteObserver);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!presenter.getContext()) {
+            presenter.init(getContext(), this);
         }
     }
 }

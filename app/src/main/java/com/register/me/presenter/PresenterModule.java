@@ -97,8 +97,6 @@ public class PresenterModule {
     @Provides
     public DocumentPresenter provideDocumentPresenter() {return new DocumentPresenter();}
 
- @Provides
-    public ActivityPresenter provideActivityPresenter() {return new ActivityPresenter();}
 
  @Provides
     public OnlineInterviewPresenter provideOnlineInterviewPresenter() {return new OnlineInterviewPresenter();}
@@ -120,4 +118,22 @@ public class PresenterModule {
 
     @Provides
     public RequestedRegionPresenter provideRequestedRegionPresenter(){return new RequestedRegionPresenter();}
+
+    @Provides
+    public MasterCRREDetailPresenter provideMasterCRREDetailPresenter(){return new MasterCRREDetailPresenter();}
+
+    @Provides
+    public CRREDetailPresenter provideCrreDetailPresenter(){return new CRREDetailPresenter();}
+
+    @Provides
+    public RREListPresenter provideRreListPresenter(){return new RREListPresenter();}
+
+    @Provides
+    public AuctionsWonPresenter provideAuctionsWonPresenter(){return new AuctionsWonPresenter();}
+
+    @Provides
+    public ProductInfoPresenter provideProductInfoPresenter(){return new ProductInfoPresenter();}
+
+    @Provides
+    public PaymentPresenter providePaymentPresenter(){return new PaymentPresenter();}
 }

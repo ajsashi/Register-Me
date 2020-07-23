@@ -23,6 +23,8 @@ public class AddAvailabilityPresenter implements Utils.UtilNetworkInterface {
 
     @Inject
     MasterNetworkCall masterNetworkCall;
+    @Inject
+    Utils utils;
     private Observer<String> message;
     private Observer<ResponseData> availableObserver;
 
@@ -39,7 +41,10 @@ public class AddAvailabilityPresenter implements Utils.UtilNetworkInterface {
             @Override
             public void onNext(String s) {
                 listener.hideProgress();
-                listener.showMessage(s);
+                masterNetworkCall.clearDisposable();
+                if (utils.isOnline(context)) {
+                    listener.showMessage(s);
+                }
             }
 
             @Override

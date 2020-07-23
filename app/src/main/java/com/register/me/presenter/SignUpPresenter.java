@@ -1,12 +1,9 @@
 package com.register.me.presenter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.util.Patterns;
-import android.view.Gravity;
 
 import com.google.gson.JsonObject;
-import com.onurkaganaldemir.ktoastlib.KToast;
 import com.register.me.APIs.ApiInterface;
 import com.register.me.APIs.ClientNetworkCall;
 import com.register.me.R;
@@ -27,7 +24,7 @@ import retrofit2.Retrofit;
 /**
  * Created by Jennifer - AIT on 15-02-2020PM 04:15.
  */
-public class SignUpPresenter implements ClientNetworkCall.NetworkCallInterface {
+public class SignUpPresenter implements ClientNetworkCall.NetworkCallInterface, Utils.UtilNetworkInterface {
 
     private Context context;
     @Inject
@@ -57,28 +54,47 @@ public class SignUpPresenter implements ClientNetworkCall.NetworkCallInterface {
         Matcher matcher = pattern.matcher(password);
         if (!email.isEmpty() && !password.isEmpty() && !role.isEmpty() && !role.equals("Select Role")) {
             if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                KToast.normalToast((Activity) context, context.getString(R.string.valid_email_alert), Gravity.BOTTOM, KToast.LENGTH_AUTO);
+                utils.showToastMessage(context,context.getString(R.string.valid_email_alert));
             } else if (!matcher.matches()) {
-                KToast.normalToast((Activity) context, context.getString(R.string.password_alert), Gravity.BOTTOM, KToast.LENGTH_AUTO);
+                utils.showToastMessage(context,context.getString(R.string.password_alert));
             } else {
                 JsonObject data = jsonBuilder.getUserSignUpJson(email, password, role);
                 apiCall(data);
             }
         } else {
-            KToast.normalToast((Activity) context, "Input Field Missing", Gravity.BOTTOM, KToast.LENGTH_AUTO);
+            utils.showToastMessage(context,"Input Field Missing");
         }
     }
 
     private void apiCall(JsonObject data) {
-        if (utils.isOnline(context)) {
+        if (checkNetStatus()) {
             listener.showProgress();
             ApiInterface apiInterface = retrofit.create(ApiInterface.class);
             networkCall.signUp(apiInterface, data, this);
-        } else {
-
         }
     }
 
+
+    public boolean checkNetStatus() {
+        if (checkNetwork()) {
+            if (!utils.checkAlert()) {
+                utils.showNetworkAlert(context, this);
+            }
+            return false;
+        } else {
+            if (utils.checkAlert()) {
+                utils.dismissAlert();
+            }
+        }
+        return true;
+    }
+
+    private boolean checkNetwork() {
+        if (!utils.isOnline(context)) {
+            return true;
+        }
+        return false;
+    }
     @Override
     public void onCallSuccess(Object response) {
         if(response instanceof RegisterModel){
@@ -104,9 +120,13 @@ public class SignUpPresenter implements ClientNetworkCall.NetworkCallInterface {
     public void sessionExpired() {
         listener.dismissProgress();
         listener.showErrorMessage("Session Expired");
-        repo.storeData(constants.getcacheIsLoggedKey(), "false");
-        repo.storeData(constants.getCACHE_USER_INFO(),null);
-        utils.sessionExpired(context);
+
+        utils.sessionExpired(context, repo);
+    }
+
+    @Override
+    public void refreshNetwork() {
+        listener.onRefresh();
     }
 
     public interface ISignUp {
@@ -117,5 +137,7 @@ public class SignUpPresenter implements ClientNetworkCall.NetworkCallInterface {
         void showAlert();
 
         void showErrorMessage(String message);
+
+        void onRefresh();
     }
 }

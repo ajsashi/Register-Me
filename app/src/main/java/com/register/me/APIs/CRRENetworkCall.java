@@ -61,11 +61,14 @@ public class CRRENetworkCall {
     }
 
     public void getMyActiveAucitons(Observer<MyActiveAuction> activeAuctionObserver) {
+        if(!checkNetStatus()){
+            return;
+        }
         Observable<Response<MyActiveAuction>> observable = retrofitBuilder.getActiveAuctionList(token)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread());
-        checkNetStatus();
+
         Disposable disposable = observable.subscribe(response -> {
                     int code = response.code();
                     switch (code) {
@@ -81,7 +84,7 @@ public class CRRENetworkCall {
                             break;
                         default:
                             errorMessage("Unexpected Error: " + code);
-                            throw new IllegalStateException("Unexpected Error: " + code);
+                            //throw new IllegalStateException("Unexpected Error: " + code);
                     }
                 },
                 error -> {
@@ -92,11 +95,13 @@ public class CRRENetworkCall {
     }
 
     public void getMyAuctionInProgress(Observer<MyAuctionInProgress> inProgressObserver) {
+        if (!checkNetStatus()) {
+            return;
+        }
         Observable<Response<MyAuctionInProgress>> observable = retrofitBuilder.getAuctionsInProgress(token)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread());
-        checkNetStatus();
         Disposable disposable = observable.subscribe(response -> {
                     int code = response.code();
                     switch (code) {
@@ -112,7 +117,7 @@ public class CRRENetworkCall {
                             break;
                         default:
                             errorMessage("Unexpected Error: " + code);
-                            throw new IllegalStateException("Unexpected Error: " + code);
+                            //throw new IllegalStateException("Unexpected Error: " + code);
                     }
                 },
                 error -> {
@@ -122,12 +127,14 @@ public class CRRENetworkCall {
     }
 
     public void submitBit(JsonObject jsonObject, Observer<ResponseData> submitObserver) {
+        if (!checkNetStatus()) {
+            return;
+        }
 
         Observable<Response<ResponseData>> observable = retrofitBuilder.submitBid(token, jsonObject)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread());
-        checkNetStatus();
         Disposable disposable = observable.subscribe(response -> {
                     int code = response.code();
                     switch (code) {
@@ -143,7 +150,7 @@ public class CRRENetworkCall {
                             break;
                         default:
                             errorMessage("Unexpected Error: " + code);
-                            throw new IllegalStateException("Unexpected Error: " + code);
+                            //throw new IllegalStateException("Unexpected Error: " + code);
                     }
                 },
                 error -> {
@@ -153,11 +160,13 @@ public class CRRENetworkCall {
     }
 
     public void declineBid(String proId, Observer<Response<ResponseData>> declineObserver) {
+        if (!checkNetStatus()) {
+            return;
+        }
         Observable<Response<ResponseData>> observable = retrofitBuilder.declineBid(token, proId)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread());
-        checkNetStatus();
         Disposable disposable = observable.subscribe(response -> {
                     int code = response.code();
                     switch (code) {
@@ -173,7 +182,7 @@ public class CRRENetworkCall {
                             break;
                         default:
                             errorMessage("Unexpected Error: " + code);
-                            throw new IllegalStateException("Unexpected Error: " + code);
+                            //throw new IllegalStateException("Unexpected Error: " + code);
                     }
                 },
                 error -> {
@@ -183,11 +192,13 @@ public class CRRENetworkCall {
     }
 
     public void getCurrencyCode(Observer<Response<CurrencyCode>> cO) {
+        if (!checkNetStatus()) {
+            return;
+        }
         Observable<Response<CurrencyCode>> observable = retrofitBuilder.getCurrencyCode(token)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread());
-        checkNetStatus();
         Disposable disposable = observable.subscribe(response -> {
                     int code = response.code();
                     switch (code) {
@@ -203,7 +214,7 @@ public class CRRENetworkCall {
                             break;
                         default:
                             errorMessage("Unexpected Error: " + code);
-                            throw new IllegalStateException("Unexpected Error: " + code);
+                            //throw new IllegalStateException("Unexpected Error: " + code);
                     }
                 },
                 error -> {
@@ -213,11 +224,13 @@ public class CRRENetworkCall {
     }
 
     public void convertCurrency(String countryCode, Observer<Response<CurrencyConversion>> cO) {
+        if (!checkNetStatus()) {
+            return;
+        }
         Observable<Response<CurrencyConversion>> observable = retrofitBuilder.getCurrency("https://prime.exchangerate-api.com/v5/76c1e88825f6439ec523bc7a/latest/" + countryCode)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread());
-        checkNetStatus();
         Disposable disposable = observable.subscribe(response -> {
                     int code = response.code();
                     switch (code) {
@@ -233,7 +246,7 @@ public class CRRENetworkCall {
                             break;
                         default:
                             errorMessage("Unexpected Error: " + code);
-                            throw new IllegalStateException("Unexpected Error: " + code);
+                            //throw new IllegalStateException("Unexpected Error: " + code);
                     }
                 },
                 error -> {
@@ -243,11 +256,13 @@ public class CRRENetworkCall {
     }
 
     public void getCertifyAndStory(Observer<Response<SuccessCertificate>> SCObserver) {
+        if (!checkNetStatus()) {
+            return;
+        }
         Observable<Response<SuccessCertificate>> observable = retrofitBuilder.getcertifyAndStory(token)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread());
-        checkNetStatus();
         Disposable disposable = observable.subscribe(response -> {
                     int code = response.code();
                     switch (code) {
@@ -263,7 +278,7 @@ public class CRRENetworkCall {
                             break;
                         default:
                             errorMessage("Unexpected Error: " + code);
-                            throw new IllegalStateException("Unexpected Error: " + code);
+                            //throw new IllegalStateException("Unexpected Error: " + code);
                     }
                 },
                 error -> {
@@ -273,11 +288,13 @@ public class CRRENetworkCall {
     }
 
     public void cancelBid(JsonObject object,Observer<Response<ResponseData>> cancelObserver) {
+        if (!checkNetStatus()) {
+            return;
+        }
         Observable<Response<ResponseData>> observable = retrofitBuilder.cancelBid(token,object)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread());
-        checkNetStatus();
         Disposable disposable = observable.subscribe(response -> {
                     int code = response.code();
                     switch (code) {
@@ -293,7 +310,7 @@ public class CRRENetworkCall {
                             break;
                         default:
                             errorMessage("Unexpected Error: " + code);
-                            throw new IllegalStateException("Unexpected Error: " + code);
+                            //throw new IllegalStateException("Unexpected Error: " + code);
                     }
                 },
                 error -> {
@@ -302,11 +319,13 @@ public class CRRENetworkCall {
         compositeDisposable.add(disposable);
     }
     public void requestNewCountry(JsonObject object,Observer<Response<ResponseData>> countryObserver) {
+        if (!checkNetStatus()) {
+            return;
+        }
         Observable<Response<ResponseData>> observable = retrofitBuilder.requestNewCountry(token,object)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread());
-        checkNetStatus();
         Disposable disposable = observable.subscribe(response -> {
                     int code = response.code();
                     switch (code) {
@@ -322,7 +341,7 @@ public class CRRENetworkCall {
                             break;
                         default:
                             errorMessage("Unexpected Error: " + code);
-                            throw new IllegalStateException("Unexpected Error: " + code);
+                            //throw new IllegalStateException("Unexpected Error: " + code);
                     }
                 },
                 error -> {
@@ -332,11 +351,13 @@ public class CRRENetworkCall {
     }
 
     public void getFiles(int id,Observer<Response<LibraryFiles>> fileObserver) {
+        if (!checkNetStatus()) {
+            return;
+        }
         Observable<Response<LibraryFiles>> observable = retrofitBuilder.getLibraryFiles(token,id)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread());
-        checkNetStatus();
         Disposable disposable = observable.subscribe(response -> {
                     int code = response.code();
                     switch (code) {
@@ -352,7 +373,7 @@ public class CRRENetworkCall {
                             break;
                         default:
                             errorMessage("Unexpected Error: " + code);
-                            throw new IllegalStateException("Unexpected Error: " + code);
+                            //throw new IllegalStateException("Unexpected Error: " + code);
                     }
                 },
                 error -> {
@@ -362,11 +383,13 @@ public class CRRENetworkCall {
     }
 
     public void deleteFile(JsonObject jsonObject, Observer<Response<CRREResponse>> deleteFileObserver){
+        if (!checkNetStatus()) {
+            return;
+        }
         Observable<Response<CRREResponse>> observable = retrofitBuilder.crreDeleteFiles(token,jsonObject)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread());
-        checkNetStatus();
         Disposable disposable = observable.subscribe(response -> {
                     int code = response.code();
                     switch (code) {
@@ -382,7 +405,7 @@ public class CRRENetworkCall {
                             break;
                         default:
                             errorMessage("Unexpected Error: " + code);
-                            throw new IllegalStateException("Unexpected Error: " + code);
+                            //throw new IllegalStateException("Unexpected Error: " + code);
                     }
                 },
                 error -> {
@@ -402,9 +425,7 @@ public class CRRENetworkCall {
         }
         Observable<String> messageObs = Observable.just(message);
 
-        repo.storeData(constants.getcacheIsLoggedKey(), "false");
-        repo.storeData(constants.getCACHE_USER_INFO(), null);
-        utils.sessionExpired(context);
+        utils.sessionExpired(context,repo);
         messageObs.subscribe(messageObserver);
     }
 
@@ -412,16 +433,18 @@ public class CRRENetworkCall {
         compositeDisposable.clear();
     }
 
-    public void checkNetStatus() {
+    public boolean checkNetStatus() {
         if (checkNetwork()) {
             if (!utils.checkAlert()) {
                 utils.showNetworkAlert(context, listener);
             }
+            return false;
         } else {
             if (utils.checkAlert()) {
                 utils.dismissAlert();
             }
         }
+        return true;
     }
 
     private boolean checkNetwork() {
@@ -453,7 +476,7 @@ public class CRRENetworkCall {
                             break;
                         default:
                             errorMessage("Unexpected Error: " + code);
-                            throw new IllegalStateException("Unexpected Error: " + code);
+                            //throw new IllegalStateException("Unexpected Error: " + code);
                     }
                 },
                 error -> {

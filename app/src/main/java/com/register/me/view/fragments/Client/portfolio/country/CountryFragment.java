@@ -17,9 +17,9 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.onurkaganaldemir.ktoastlib.KToast;
 import com.register.me.R;
 import com.register.me.model.data.model.ProjectModel;
+import com.register.me.model.data.util.Utils;
 import com.register.me.presenter.CountryPresenter;
 import com.register.me.view.BaseFragment;
 import com.register.me.view.fragmentmanager.manager.IFragment;
@@ -47,6 +47,8 @@ public class CountryFragment extends BaseFragment implements IFragment, CountryP
     TextView name;
     @Inject
     CountryPresenter presenter;
+    @Inject
+    Utils utils;
 
 
     @Override
@@ -137,8 +139,7 @@ public class CountryFragment extends BaseFragment implements IFragment, CountryP
 
     @Override
     public void showMessage(String message) {
-        KToast.customColorToast((Activity) getContext(), message, Gravity.BOTTOM, KToast.LENGTH_SHORT, R.color.red);
-
+        utils.showToastMessage(getContext(),message);
     }
 
     @Override

@@ -11,9 +11,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.register.me.R;
+import com.register.me.model.data.model.CertifiedRREList;
 import com.register.me.model.data.model.Client;
+import com.register.me.model.data.model.McrreList;
 import com.register.me.model.data.model.RRE;
-import com.register.me.view.Adapter.MasterCRREAdapter.RREViewHolder;
 
 import java.util.List;
 
@@ -21,6 +22,8 @@ public class MasterCRREAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     private static final int CASE_CLIENT = 1;
     private static final int CASE_RRE = 2;
+    private static final int CASE_CRRE = 3;
+    private static final int CASE_MCRRE = 4;
     private Context context;
     private List<Object> dataList;
 
@@ -37,27 +40,42 @@ public class MasterCRREAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = null;
-        if (viewType == CASE_CLIENT) {
+        if (viewType == CASE_CLIENT||viewType==CASE_MCRRE) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.client_item, parent, false);
             return new ClientViewHolder(view);
         } else if (viewType == CASE_RRE) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.rre_item, parent, false);
             return new RREViewHolder(view);
+        }else if(viewType == CASE_CRRE){
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.crre_item, parent, false);
+            return new CRREViewHolder(view);
         }
         return null;
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        if (holder.getItemViewType() == CASE_CLIENT) {
-            Client.Clientdetail data = (Client.Clientdetail) dataList.get(position);
-            ((ClientViewHolder)holder).bindClientData(data);
+        final int itemViewType = holder.getItemViewType();
+        switch (itemViewType){
+            case CASE_CLIENT:
+                Client.Clientdetail data = (Client.Clientdetail) dataList.get(position);
+                ((ClientViewHolder)holder).bindClientData(data);
+                break;
+            case CASE_RRE:
+                RRE.RREdetail rreData = (RRE.RREdetail) dataList.get(position);
+                ((RREViewHolder)holder).bindRREData(rreData);
+                break;
+            case CASE_CRRE:
+                CertifiedRREList.Certifiedrredetail crreData = (CertifiedRREList.Certifiedrredetail) dataList.get(position);
+                ((CRREViewHolder)holder).bindCRREData(crreData);
+                break;
+            case CASE_MCRRE:
+                McrreList.Mastercrre mcrreData = (McrreList.Mastercrre)dataList.get(position);
+                ((ClientViewHolder)holder).bindMcrreData(mcrreData);
+                break;
 
-        } else {
-            RRE.RREdetail data = (RRE.RREdetail) dataList.get(position);
-            ((RREViewHolder)holder).bindRREData(data);
         }
-    }
+          }
 
 
     @Override
@@ -72,6 +90,10 @@ public class MasterCRREAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             return CASE_CLIENT;
         } else if (o instanceof RRE.RREdetail) {
             return CASE_RRE;
+        }else if(o instanceof CertifiedRREList.Certifiedrredetail){
+            return CASE_CRRE;
+        }else if(o instanceof McrreList.Mastercrre){
+            return CASE_MCRRE;
         }
         return -1;
     }
@@ -88,10 +110,10 @@ public class MasterCRREAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         ClientViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            txtClientName = itemView.findViewById(R.id.txt_client_name);
-            txtClientMail = itemView.findViewById(R.id.txt_client_mail);
-            txtClientStatus = itemView.findViewById(R.id.txt_client_status);
-            txtClientMobile = itemView.findViewById(R.id.txt_client_mobile);
+            txtClientName = itemView.findViewById(R.id.txt_crre_name);
+            txtClientMail = itemView.findViewById(R.id.txt_crre_mail);
+            txtClientStatus = itemView.findViewById(R.id.txt_crre_regions);
+            txtClientMobile = itemView.findViewById(R.id.txt_crre_mobile);
             viewIcon = itemView.findViewById(R.id.icon_view);
         }
 
@@ -103,6 +125,14 @@ public class MasterCRREAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
            viewIcon.setOnClickListener(v ->{
                listener.onViewClick(data.getId());
            });
+        }
+
+        public void bindMcrreData(McrreList.Mastercrre mcrreData) {
+            txtClientName.setText(mcrreData.getFullName());
+            txtClientMail.setText(mcrreData.getEmail());
+            txtClientMobile.setText(mcrreData.getCellphone());
+            txtClientStatus.setText("IsAdmin : "+mcrreData.getIsAdmin());
+            viewIcon.setVisibility(View.GONE);
         }
     }
 
@@ -157,6 +187,36 @@ public class MasterCRREAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
     }
 
+
+    class CRREViewHolder extends RecyclerView.ViewHolder {
+
+        TextView txt_crre_name;
+        TextView txt_crre_mail;
+        TextView txt_crre_regions;
+        TextView txt_crre_mobile;
+        ImageView viewIcon;
+
+
+        CRREViewHolder(@NonNull View itemView) {
+            super(itemView);
+
+            txt_crre_name = itemView.findViewById(R.id.txt_crre_name);
+            txt_crre_mail = itemView.findViewById(R.id.txt_crre_mail);
+            txt_crre_regions = itemView.findViewById(R.id.txt_crre_regions);
+            txt_crre_mobile = itemView.findViewById(R.id.txt_crre_mobile);
+            viewIcon = itemView.findViewById(R.id.icon_view);
+        }
+
+        public void bindCRREData(CertifiedRREList.Certifiedrredetail data) {
+            txt_crre_name.setText(data.getFullName()==null? " - ": data.getFullName());
+            txt_crre_mail.setText(data.getEmail()==null? " - " : data.getEmail());
+            txt_crre_regions.setText(data.getTelephone() == null? " - ":data.getTelephone());
+            txt_crre_mobile.setText(data.getCertifiedCountry() == null? " - ": data.getCertifiedCountry());
+            viewIcon.setOnClickListener(v ->{
+                listener.onViewClick(data.getId());
+            });
+        }
+    }
     public interface OnIconClickListener {
         void onViewClick(Integer id);
 

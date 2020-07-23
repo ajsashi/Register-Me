@@ -7,6 +7,7 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -32,6 +33,8 @@ public class BidsToEvaluateFragment extends BaseFragment implements AuctionAdapt
     RecyclerView recyclerView;
     @BindView(R.id.no_content_layout)
     LinearLayout noContentLayout;
+    @BindView(R.id.progressbar)
+    ConstraintLayout progressbar;
     @Inject
     AuctionAdapter auctionAdapter;
     @Inject
@@ -68,7 +71,7 @@ public class BidsToEvaluateFragment extends BaseFragment implements AuctionAdapt
     private void switchLayout() {
         list = presenter.getBidList();
 
-        if (list == null) {
+        if (list == null ||list.size()==0) {
             noContentLayout.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         } else {
@@ -93,23 +96,23 @@ public class BidsToEvaluateFragment extends BaseFragment implements AuctionAdapt
 
     @Override
     public void buildUI(List<ActiveAuction.Auctionsprogress> data) {
-        //Do Nothing
+        switchLayout();
     }
 
 
     @Override
     public void navigate() {
-
+presenter.getAuctionList();
     }
 
     @Override
     public void showProgress() {
-
+        progressbar.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void dismissProgress() {
-
+        progressbar.setVisibility(View.GONE);
     }
 
     @Override
@@ -122,6 +125,5 @@ public class BidsToEvaluateFragment extends BaseFragment implements AuctionAdapt
     @Override
     public void onDirectAssignmentClick(int adapterPosition) {
         presenter.directAssignment(list.get(adapterPosition).getId());
-
     }
 }

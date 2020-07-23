@@ -7,15 +7,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.register.me.R;
-import com.register.me.model.data.model.ClientProductList;
 import com.register.me.model.data.model.GetProductModel;
-import com.register.me.view.fragments.Master.MasterViewDetailFragment;
 
 import java.util.List;
 
@@ -67,13 +64,13 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
             productName = itemView.findViewById(R.id.pName);
             viewIcon = itemView.findViewById(R.id.view_icon);
             auctionIcon = itemView.findViewById(R.id.auction_icon);
-            /*sendIcon = itemView.findViewById(R.id.send_icon);*/
+            sendIcon = itemView.findViewById(R.id.send_icon);
             editIcon = itemView.findViewById(R.id.edit_icon);
             countryIcon = itemView.findViewById(R.id.country_icon);
 
             viewIcon.setOnClickListener(this);
             auctionIcon.setOnClickListener(this);
-            /*sendIcon.setOnClickListener(this);*/
+            sendIcon.setOnClickListener(this);
             editIcon.setOnClickListener(this);
 
             countryIcon.setOnClickListener(this);
@@ -90,12 +87,12 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
                 case R.id.auction_icon:
                     listener.onAuctionIconClick(getAdapterPosition());
                     break;
-                /*case R.id.send_icon:
-                    listener.onSendIconClick(getAdapterPosition());
-                    break;*/
+                case R.id.send_icon:
+                    listener.onSendIconClick(getAdapterPosition(),datalist.get(getAdapterPosition()).getProduct().getProductName());
+                    break;
                 case R.id.edit_icon:
                     listener.onEditIconClick(getAdapterPosition());
-                    Toast.makeText(context, "Edit Clicked", Toast.LENGTH_SHORT).show();
+
                     break;
                 case R.id.country_icon:
                     listener.onCountryIconClick(getAdapterPosition());
@@ -111,7 +108,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
 
             viewIcon.setVisibility(product.getIsView()? View.VISIBLE : View.GONE);
             auctionIcon.setVisibility(product.getIsinitiatebid()? View.VISIBLE : View.GONE);
-         /*   sendIcon.setVisibility(product.getIsdirectassign()? View.VISIBLE : View.GONE);*/
+            sendIcon.setVisibility(product.getIsdirectassign()? View.VISIBLE : View.GONE);
             editIcon.setVisibility(product.getIsEdit()? View.VISIBLE : View.GONE);
 //            List<GetProductModel.Project> project = product.getProject();
 
@@ -125,7 +122,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
 
         void onAuctionIconClick(int position);
 
-    /*    void onSendIconClick(int adapterPosition);*/
+        void onSendIconClick(int adapterPosition, String productName);
 
         void onCountryIconClick(int adapterPosition);
 

@@ -5,10 +5,10 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.onurkaganaldemir.ktoastlib.KToast;
 import com.register.me.R;
 import com.register.me.model.data.util.Utils;
 import com.register.me.presenter.SignUpPresenter;
@@ -27,8 +27,10 @@ public class SignUpActivity extends BaseActivity implements SignUpPresenter.ISig
     TextView edtPassword;
     @BindView(R.id.spinner_role)
     Spinner spinnerRole;
-    @BindView(R.id.progressbar)
+    @BindView(R.id.progress_bar)
     ConstraintLayout progressBarLayout;
+    @BindView(R.id.progressbar)
+    ConstraintLayout pBar;
 
     @Inject
     SignUpPresenter presenter;
@@ -64,6 +66,7 @@ public class SignUpActivity extends BaseActivity implements SignUpPresenter.ISig
     public void showProgress() {
         if (progressBarLayout.getVisibility() == View.GONE) {
             progressBarLayout.setVisibility(View.VISIBLE);
+            pBar.setVisibility(View.VISIBLE);
         }
     }
 
@@ -71,6 +74,7 @@ public class SignUpActivity extends BaseActivity implements SignUpPresenter.ISig
     public void dismissProgress() {
         if (progressBarLayout.getVisibility() == View.VISIBLE) {
             progressBarLayout.setVisibility(View.GONE);
+            pBar.setVisibility(View.GONE);
         }
     }
 
@@ -81,7 +85,11 @@ public class SignUpActivity extends BaseActivity implements SignUpPresenter.ISig
 
     @Override
     public void showErrorMessage(String message) {
-        KToast.customColorToast(this, message, Gravity.BOTTOM, KToast.LENGTH_SHORT, R.color.red);
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();    }
+
+    @Override
+    public void onRefresh() {
+       presenter.checkNetStatus();
     }
 
     @Override

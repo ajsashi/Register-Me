@@ -13,7 +13,6 @@ import com.register.me.R;
 import com.register.me.model.data.util.Utils;
 import com.register.me.presenter.InitiateRegistrationPresenter;
 import com.register.me.view.BaseFragment;
-import com.register.me.view.HomeActivity;
 import com.register.me.view.fragmentmanager.manager.IFragment;
 
 import java.text.DateFormat;
@@ -29,9 +28,12 @@ import butterknife.OnClick;
  */
 public class CRREDirectFragment extends BaseFragment implements IFragment, Utils.UtilDateTimeInterface {
     private static final String FRAGMENT_NAME = "InitiateProductRegistration";
+    private static String mProductName;
 
     @BindView(R.id.txtDate)
     TextView txtDate;
+    @BindView(R.id.txt_pName)
+    TextView txtPName;
     @Inject
     InitiateRegistrationPresenter addProductPresenter;
     @Inject
@@ -49,10 +51,9 @@ public class CRREDirectFragment extends BaseFragment implements IFragment, Utils
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        txtPName.setText(mProductName);
 
     }
-
 
 
     @Override
@@ -65,14 +66,15 @@ public class CRREDirectFragment extends BaseFragment implements IFragment, Utils
         return R.layout.fragment_direct_assignment;
     }
 
-    public static CRREDirectFragment newInstance() {
+    public static CRREDirectFragment newInstance(String productName) {
+        mProductName = productName;
         return new CRREDirectFragment();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @OnClick(R.id.txtDate)
-    public  void onDateClicked() {
-        util.showCalendar(getContext(),this,0);
+    public void onDateClicked() {
+        util.showCalendar(getContext(), this, 0);
         Toast.makeText(getContext(), "Date Clicked", Toast.LENGTH_SHORT).show();
     }
 
@@ -84,6 +86,17 @@ public class CRREDirectFragment extends BaseFragment implements IFragment, Utils
 
     @Override
     public void onTimeSet(Integer currentHour, Integer currentMinute) {
+
+    }
+
+    @OnClick(R.id.card_email)
+    public void oncard_emailClick() {
+        Toast.makeText(getContext(), "To Do", Toast.LENGTH_SHORT).show();
+    }
+
+    @OnClick(R.id.card_cancel)
+    public void oncard_cancelClick() {
+        fragmentChannel.popUp();
 
     }
 }

@@ -1,7 +1,6 @@
 package com.register.me.presenter;
 
 import android.content.Context;
-import android.util.Log;
 import android.util.Patterns;
 
 import com.register.me.APIs.ApiInterface;
@@ -189,9 +188,8 @@ public class LoginPresenter implements ClientNetworkCall.NetworkCallInterface, U
     public void sessionExpired() {
         loginListener.dismissProgress();
         loginListener.showErroMessage("Session Expired");
-        repo.storeData(constants.getcacheIsLoggedKey(), "false");
-        repo.storeData(constants.getCACHE_USER_INFO(),null);
-        utils.sessionExpired(context);
+
+        utils.sessionExpired(context, repo);
     }
 
     public String getRole() {

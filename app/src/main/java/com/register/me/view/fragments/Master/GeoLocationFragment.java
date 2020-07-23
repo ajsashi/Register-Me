@@ -1,8 +1,13 @@
 package com.register.me.view.fragments.Master;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
@@ -11,14 +16,14 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+
 import com.register.me.R;
 import com.register.me.model.data.model.GeographicLocation;
+import com.register.me.model.data.util.Utils;
 import com.register.me.presenter.GeoLocationPresenter;
 import com.register.me.view.Adapter.GeoListAdapter;
 import com.register.me.view.BaseFragment;
 import com.register.me.view.fragmentmanager.manager.IFragment;
-
-import org.jetbrains.annotations.Contract;
 
 import java.util.List;
 
@@ -37,11 +42,15 @@ public class GeoLocationFragment extends BaseFragment implements IFragment, GeoL
     RecyclerView recyclerView;
     @BindView(R.id.no_content_layout)
     LinearLayout noContentLayout;
+    @BindView(R.id.edt_search)
+    EditText edtSearch;
     @Inject
     GeoLocationPresenter presenter;
     @Inject
     GeoListAdapter adapter;
     private Context context;
+    @Inject
+    Utils utils;
 
 
     public static IFragment newInstance() {
@@ -66,8 +75,28 @@ public class GeoLocationFragment extends BaseFragment implements IFragment, GeoL
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         presenter.getGeoList();
+        edtSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+adapter.getFilter().filter(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
 
+    @OnClick(R.id.img_close)
+    public void onImageClose(){
+        edtSearch.setText("");
+    }
 
     private void setAdapter(List<GeographicLocation.Location> list) {
         recyclerView.setVisibility(View.VISIBLE);
@@ -79,18 +108,18 @@ public class GeoLocationFragment extends BaseFragment implements IFragment, GeoL
     }
 
     @OnClick(R.id.add_geo_location)
-    public void onAddGeoClick(){
-        presenter.showAlertDialog();
+    public void onAddGeoClick() {
+        presenter.showAlertDialog("Add");
     }
 
     @OnClick(R.id.globe)
-    public void onReqRegionClick(){
+    public void onReqRegionClick() {
         fragmentChannel.showReqRegionList();
     }
+
     @Override
     public void showMessage(String s) {
-
-    }
+        utils.showToastMessage(getContext(),s);    }
 
     @Override
     public void updateRecyclerView(List<GeographicLocation.Location> locations) {
@@ -126,12 +155,21 @@ public class GeoLocationFragment extends BaseFragment implements IFragment, GeoL
     }
 
     @Override
-    public void onApprove(Integer id) {
-
+    public void onEdit(Integer id, String geographiclocation) {
+        presenter.setId(id);
+        presenter.setRegion(geographiclocation);
+        presenter.showAlertDialog("Edit");
     }
 
     @Override
     public void onCancel(Integer id) {
+        presenter.setId(id);
+        presenter.showAlertDialog("Cancel");
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        fragmentChannel.setTitle("Geographic Location List");
     }
 }

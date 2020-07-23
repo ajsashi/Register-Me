@@ -3,6 +3,7 @@ package com.register.me.view.fragments.Master;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -15,12 +16,14 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.onurkaganaldemir.ktoastlib.KToast;
+
 import com.register.me.R;
 import com.register.me.model.data.model.TimeSlotKV;
+import com.register.me.model.data.util.Utils;
 import com.register.me.presenter.AddAvailabilityPresenter;
 import com.register.me.view.BaseFragment;
 import com.register.me.view.fragmentmanager.manager.IFragment;
@@ -58,7 +61,10 @@ public class AddAvailabilityFragment extends BaseFragment implements IFragment, 
     private int mDay = -1;
     private int mHour = -1;
     private int mMinute = -1;
-    private int removedIndexCount = -1;
+//    private int removedIndexCount = -1;
+    @Inject
+    Utils utils;
+    private int ct=-1;
 
     public static IFragment newInstance() {
         return new AddAvailabilityFragment();
@@ -76,7 +82,7 @@ public class AddAvailabilityFragment extends BaseFragment implements IFragment, 
         injector().inject(this);
         presenter.init(getContext(), this);
     }
-
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -85,6 +91,8 @@ public class AddAvailabilityFragment extends BaseFragment implements IFragment, 
         inflateLayout();
     }
 
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void inflateLayout() {
         containerTS.removeAllViews();
         containerTS.addView(addItem(true));
@@ -92,6 +100,7 @@ public class AddAvailabilityFragment extends BaseFragment implements IFragment, 
 
     /*
      * inflates new item to the time slot*/
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private View addItem(boolean isFirst) {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.time_slot_item, containerTS, false);
         TextView from_time = view.findViewById(R.id.from_time);
@@ -102,16 +111,16 @@ public class AddAvailabilityFragment extends BaseFragment implements IFragment, 
          * Check condition to display button text for first button and the other buttons*/
         if (isFirst) {
             cardText.setText("Add");
-            card_add.setCardBackgroundColor(getContext().getColor(R.color.green));
+            card_add.setCardBackgroundColor(getContext().getResources().getColor(R.color.green));
         } else {
             cardText.setText("Remove");
-            card_add.setCardBackgroundColor(getContext().getColor(R.color.red));
+            card_add.setCardBackgroundColor(getContext().getResources().getColor(R.color.red));
         }
-        int ct = containerTS.getChildCount();
-
-        FromToTime.add(new TimeSlotKV(ct, "", ""));
+         ct = ct+1;
+        FromToTime.add(new TimeSlotKV(ct ,"", ""));
 
         from_time.setTag(R.id.index, ct);
+        card_add.setTag(R.id.index,ct);
         from_time.setOnClickListener(v -> {
             from_time.setTag(R.id.usecase, "from");
             callTimePicker(from_time, "");
@@ -128,14 +137,22 @@ public class AddAvailabilityFragment extends BaseFragment implements IFragment, 
                 containerTS.addView(addItem(false));
             } else {
                 containerTS.removeView((View) card_add.getTag());
-                removedIndexCount = removedIndexCount + 1;
-                final int index = ct - removedIndexCount;
-                FromToTime.remove(index);
-                if (FromToTime.size() == 1) {
-                    removedIndexCount = -1;
+//                removedIndexCount = removedIndexCount + 1;
+//                final int index = ct - removedIndexCount;
+                int index;
+                index = (int)card_add.getTag(R.id.index);
+                for (TimeSlotKV ft: FromToTime){
+                    if(ft.getIndex()==index){
+                        FromToTime.remove(ft);
+                        break;
+                    }
                 }
+//                FromToTime.remove(index);
+//                if (FromToTime.size() == 1) {
+//                    removedIndexCount = -1;
+//                }
 
-                Toast.makeText(getContext(), "Clicked Remove", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getContext(), "Clicked Remove", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -161,38 +178,43 @@ public class AddAvailabilityFragment extends BaseFragment implements IFragment, 
 
                         //format takes in a Date, and Time is a sublcass of Date
                         String s = simpleDateFormat.format(time);
-//                        v.setText(s+hourOfDay + ":" + minute);
                         SimpleDateFormat arrayFormat = new SimpleDateFormat("HH:mm:ss");
                         String arrayFormatDate = arrayFormat.format(time);
                         int index = (int) v.getTag(R.id.index);
                         String callCase = (String) v.getTag(R.id.usecase);
-                        final int index1 = index - removedIndexCount;
+
                         if (callCase.equals("from")) {
 
                             TimeSlotKV ft = null;
+                            int i=0;
                             for (TimeSlotKV it : FromToTime) {
                                 if (it.getIndex() == index) {
                                     ft = it;
+                                    ft.setFromTime(arrayFormatDate);
+                                    FromToTime.set(i,ft);
+                                    break;
                                 }
+                                i++;
                             }
-                            //int ft = FromTime.indexOf(index);
-                            // FromTime.set(ft.getIndex(),new TimeSlotKV(ft,arrayFormatDate));
-                            FromToTime.get(ft.getIndex()).setFromTime(arrayFormatDate);
+
                         } else {
                             TimeSlotKV tt = null;
+                            int i=0;
                             for (TimeSlotKV it : FromToTime) {
                                 if (it.getIndex() == index) {
-                                    tt = it;
+                                    tt= it;
+                                    tt.setToTime(arrayFormatDate);
+                                    FromToTime.set(i,tt);
+                                    break;
                                 }
+                                i++;
                             }
-                            //int ft = FromTime.indexOf(index);
-                            // FromTime.set(ft.getIndex(),new TimeSlotKV(ft,arrayFormatDate));
-                            FromToTime.get(tt.getIndex()).setToTime(arrayFormatDate);
                         }
                         v.setText(st + s);
                     }
                 }, mHour, mMinute, false);
         timePickerDialog.show();
+
     }
 
     @OnClick(R.id.dateView)
@@ -225,11 +247,22 @@ public class AddAvailabilityFragment extends BaseFragment implements IFragment, 
 
                     }
                 }, mYear, mMonth, mDay);
+        datePickerDialog.getDatePicker().setMinDate(c.getTimeInMillis());
         datePickerDialog.show();
     }
 
     @OnClick(R.id.submit_btn)
     public void onSubmitClick() {
+        if(selectedDate==null ||selectedDate.isEmpty()){
+            Toast.makeText(getContext(), "Please select Date", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        for (TimeSlotKV li : FromToTime){
+            if(li.getFromTime()==null||li.getFromTime().isEmpty()||li.getToTime()==null||li.getToTime().isEmpty()){
+                Toast.makeText(getContext(), "Please fill the start and end time", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
         presenter.submitApi(selectedDate, FromToTime);
     }
 
@@ -240,7 +273,7 @@ public class AddAvailabilityFragment extends BaseFragment implements IFragment, 
 
     @Override
     public void showMessage(String s) {
-        KToast.customColorToast((Activity) getContext(), s, Gravity.BOTTOM, KToast.LENGTH_SHORT, R.color.red);
+        utils.showToastMessage(getContext(),s);
         fragmentChannel.popUp();
     }
 

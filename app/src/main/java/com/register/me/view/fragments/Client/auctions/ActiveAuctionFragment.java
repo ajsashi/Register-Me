@@ -11,9 +11,9 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.onurkaganaldemir.ktoastlib.KToast;
 import com.register.me.R;
 import com.register.me.model.data.model.ActiveAuction;
+import com.register.me.model.data.util.Utils;
 import com.register.me.presenter.ActiveAuctionPresenter;
 import com.register.me.view.Adapter.AuctionAdapter;
 import com.register.me.view.BaseFragment;
@@ -41,6 +41,8 @@ public class ActiveAuctionFragment extends BaseFragment implements ActiveAuction
     @Inject
     ActiveAuctionPresenter presenter;
     private List<ActiveAuction.Auctionsprogress> dataList;
+   @ Inject
+    Utils utils;
 
 
     public ActiveAuctionFragment() {
@@ -79,8 +81,7 @@ public class ActiveAuctionFragment extends BaseFragment implements ActiveAuction
         if (message.equals("400")) {
             enableNoContentLay();
         } else {
-            KToast.customColorToast((Activity) getContext(), message, Gravity.BOTTOM, KToast.LENGTH_AUTO, R.color.red);
-        }
+            utils.showToastMessage(getContext(),message);        }
 
     }
 
@@ -90,7 +91,7 @@ public class ActiveAuctionFragment extends BaseFragment implements ActiveAuction
             dataList.clear();
         }
         dataList = data;
-        if (dataList.size() == 0) {
+        if (data ==null||dataList.size() == 0) {
             enableNoContentLay();
         } else {
             setAdapter(data);

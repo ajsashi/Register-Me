@@ -3,6 +3,7 @@ package com.register.me.presenter;
 import android.content.Context;
 import android.content.res.Resources;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.register.me.APIs.ApiInterface;
 import com.register.me.APIs.ClientNetworkCall;
@@ -25,7 +26,7 @@ import javax.inject.Inject;
 import retrofit2.Retrofit;
 
 
-public class AddProductPresenter implements ClientNetworkCall.NetworkCallInterface {
+public class AddProductPresenter implements ClientNetworkCall.NetworkCallInterface, Utils.UtilNetworkInterface {
     private Context context;
     private IAddProduct listener;
     @Inject
@@ -149,24 +150,34 @@ public class AddProductPresenter implements ClientNetworkCall.NetworkCallInterfa
 
     public List<QandA> getRREApplication() {
         RREApplication rreApplication = constants.getApplicationData();
+        // For Low memory devices the data will be cleared in backgroud to handle such case following code is used.
+        if(rreApplication == null){
+            rreApplication = new Gson().fromJson(repo.getData(constants.getCACHE_APPLICATION_DATA()), RREApplication.class);
+        }
         ArrayList<QandA> quest = new ArrayList<>();
-        RREApplication.Application application = rreApplication.getData().getApplication();
-        quest.add(new QandA("How many product registrations have you completed?", application.getRegisteredproducts() == null ? "" : application.getRegisteredproducts().toString(), 1, 4, 1, "registeredproducts", null, null));
-        quest.add(new QandA("Characterize your successful product registrations", application.getRegisteredProductDescription() == null ? "" : application.getRegisteredProductDescription(), 1, 1, 1, "productdescription", null, null));
-        quest.add(new QandA("Product Classification", application.getDeviceClassification() == null ? "" : getStringList((ArrayList<String>) application.getDeviceClassification()), 3, 1, 2, "deviceclassification", null, application.getDeviceClassification()));
-        quest.add(new QandA("Have any been IVD?", application.getIvd() == null ? "" : String.valueOf(application.getIvd()), 2, 0, 0, "ivd", null, null));
-        quest.add(new QandA("Have any been life supporting / life sustaining?", application.getLifeSupporting() == null ? "" : String.valueOf(application.getLifeSupporting()), 2, 0, 0, "lifesupporting", null, null));
-        QandA implant = new QandA("If yes, is it an implant?", application.getIsItAnImplant() == null ? "" : application.getIsItAnImplant().toString(), 2, 0, 0, "isitanimplant", null, null);
-        quest.add(new QandA("Have any had direct or indirect patients contacting components?", application.getPatientContactComponents() == null ? "" : String.valueOf(application.getPatientContactComponents()), 4, 0, 0, "patientcontactcomponents", implant, null));
-        quest.add(new QandA("How many registered products used software and / or firmware?", application.getUsedSoftwareProducts() == null ? "" : String.valueOf(application.getUsedSoftwareProducts()), 1, 4, 0, "usedsoftwareproducts", null, null));
-        quest.add(new QandA("Connection Type", application.getConnectionType() == null ? "" : getStringList((ArrayList<String>) application.getConnectionType()), 3, 3, 1, "connectiontype", null, application.getConnectionType()));
-        quest.add(new QandA("How many registered products were sterilized products?", application.getSterilizedProducts() == null ? "" : application.getSterilizedProducts().toString(), 1, 4, 1, "sterilizedproducts", null, null));
-        quest.add(new QandA("Product Type", application.getDeviceType() == null ? "" : application.getDeviceType().toString(), 3, 0, 0, "devicetype", null, application.getDeviceType()));
-        quest.add(new QandA("Usage Environment", application.getUseEnvironment() == null ? "" : getStringList((ArrayList<String>) application.getUseEnvironment()), 3, 0, 0, "useenvironment", null, application.getUseEnvironment()));
-        quest.add(new QandA("Have any been combination devices?", application.getIsCombinationDevice() == null ? "" : application.getIsCombinationDevice().toString(), 2, 0, 0, "iscombinationdevice", null, null));
-        QandA deviceType = new QandA("Electrical Product Type", application.getElectricalDeviceType() == null ? "" : getStringList((ArrayList<String>) application.getElectricalDeviceType()), 3, 0, 0, "electricaldevicetype", null, application.getElectricalDeviceType());
-        quest.add(new QandA("Have any been electrical?", application.getIsElectricalDevice() == null ? "" : application.getIsElectricalDevice().toString(), 5, 0, 0, "iselectricaldevice", deviceType, null));
-        quest.add(new QandA("Have any been adult (pediatric)?", application.getIsPediatric() == null ? "" : application.getIsPediatric().toString(), 2, 0, 0, "ispediatric", null, null));
+        final RREApplication.Data data = rreApplication.getData();
+        if(data == null ){
+            return null;
+        }
+        RREApplication.Application application = data.getApplication();
+        if(application!=null) {
+            quest.add(new QandA("How many product registrations have you completed?", application.getRegisteredproducts() == null ? "" : application.getRegisteredproducts().toString(), 1, 4, 1, "registeredproducts", null, null));
+            quest.add(new QandA("Characterize your successful product registrations", application.getRegisteredProductDescription() == null ? "" : application.getRegisteredProductDescription(), 1, 1, 1, "productdescription", null, null));
+            quest.add(new QandA("Product Classification", application.getDeviceClassification() == null ? "" : getStringList((ArrayList<String>) application.getDeviceClassification()), 3, 1, 2, "deviceclassification", null, application.getDeviceClassification()));
+            quest.add(new QandA("Have any been IVD?", application.getIvd() == null ? "" : String.valueOf(application.getIvd()), 2, 0, 0, "ivd", null, null));
+            quest.add(new QandA("Have any been life supporting / life sustaining?", application.getLifeSupporting() == null ? "" : String.valueOf(application.getLifeSupporting()), 2, 0, 0, "lifesupporting", null, null));
+            QandA implant = new QandA("If yes, is it an implant?", application.getIsItAnImplant() == null ? "" : application.getIsItAnImplant().toString(), 2, 0, 0, "isitanimplant", null, null);
+            quest.add(new QandA("Have any had direct or indirect patients contacting components?", application.getPatientContactComponents() == null ? "" : String.valueOf(application.getPatientContactComponents()), 4, 0, 0, "patientcontactcomponents", implant, null));
+            quest.add(new QandA("How many registered products used software and / or firmware?", application.getUsedSoftwareProducts() == null ? "" : String.valueOf(application.getUsedSoftwareProducts()), 1, 4, 0, "usedsoftwareproducts", null, null));
+            quest.add(new QandA("Connection Type", application.getConnectionType() == null ? "" : getStringList((ArrayList<String>) application.getConnectionType()), 3, 3, 1, "connectiontype", null, application.getConnectionType()));
+            quest.add(new QandA("How many registered products were sterilized products?", application.getSterilizedProducts() == null ? "" : application.getSterilizedProducts().toString(), 1, 4, 1, "sterilizedproducts", null, null));
+            quest.add(new QandA("Product Type", application.getDeviceType() == null ? "" : application.getDeviceType().toString(), 3, 0, 0, "devicetype", null, application.getDeviceType()));
+            quest.add(new QandA("Usage Environment", application.getUseEnvironment() == null ? "" : getStringList((ArrayList<String>) application.getUseEnvironment()), 3, 0, 0, "useenvironment", null, application.getUseEnvironment()));
+            quest.add(new QandA("Have any been combination devices?", application.getIsCombinationDevice() == null ? "" : application.getIsCombinationDevice().toString(), 2, 0, 0, "iscombinationdevice", null, null));
+            QandA deviceType = new QandA("Electrical Product Type", application.getElectricalDeviceType() == null ? "" : getStringList((ArrayList<String>) application.getElectricalDeviceType()), 3, 0, 0, "electricaldevicetype", null, application.getElectricalDeviceType());
+            quest.add(new QandA("Have any been electrical?", application.getIsElectricalDevice() == null ? "" : application.getIsElectricalDevice().toString(), 5, 0, 0, "iselectricaldevice", deviceType, null));
+            quest.add(new QandA("Have any been adult (pediatric)?", application.getIsPediatric() == null ? "" : application.getIsPediatric().toString(), 2, 0, 0, "ispediatric", null, null));
+        }
         return quest;
     }
 
@@ -234,7 +245,7 @@ public class AddProductPresenter implements ClientNetworkCall.NetworkCallInterfa
                 networkCall.addProduct(apiInterface, token, data, this);
             }
         } else {
-            listener.showErrorMessage(context.getResources().getString(R.string.network_alert));
+           utils.showNetworkAlert(context,this);
         }
     }
 
@@ -265,11 +276,17 @@ public class AddProductPresenter implements ClientNetworkCall.NetworkCallInterfa
         listener.showErrorMessage("Session Expired");
         repo.storeData(constants.getcacheIsLoggedKey(), "false");
         repo.storeData(constants.getCACHE_USER_INFO(), null);
-        utils.sessionExpired(context);
+        utils.sessionExpired(context, repo);
     }
 
     public int getRole() {
         return constants.getuserRole();
+    }
+
+    @Override
+    public void refreshNetwork() {
+        utils.dismissAlert();
+        apicall();
     }
 
 

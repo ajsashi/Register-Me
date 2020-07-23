@@ -45,7 +45,10 @@ public class MasterAvailabilityPresenter implements Utils.UtilNetworkInterface,U
 
             @Override
             public void onNext(String s) {
-                listener.showMessage(s);
+                masterNetworkCall.clearDisposable();
+                listener.hideProgress();
+                if (utils.isOnline(context)) {
+                listener.showMessage(s); }
             }
 
             @Override
@@ -92,7 +95,8 @@ public class MasterAvailabilityPresenter implements Utils.UtilNetworkInterface,U
 
     @Override
     public void refreshNetwork() {
-
+        listener.hideProgress();
+        masterNetworkCall.checkNetStatus();
     }
 
     public void approveSchedule(Integer id) {

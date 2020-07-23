@@ -1,12 +1,11 @@
 package com.register.me.view.fragments.Client.activeProjects;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -15,7 +14,6 @@ import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.gson.JsonObject;
-import com.onurkaganaldemir.ktoastlib.KToast;
 import com.register.me.APIs.RRENetworkCall;
 import com.register.me.R;
 import com.register.me.model.data.model.RREApplication;
@@ -40,6 +38,7 @@ import io.reactivex.disposables.Disposable;
  */
 public class CommentFragment extends BaseFragment implements IFragment, CommentPresenter.ICommentListener, Utils.UtilNetworkInterface {
 
+    private static List<RREApplication.Comment> mMasterComment;
     @BindView(R.id.description_container)
     LinearLayout commentContainer;
     @BindView(R.id.progressbar)
@@ -50,21 +49,34 @@ public class CommentFragment extends BaseFragment implements IFragment, CommentP
     ConstraintLayout postCommentLayout;
     @BindView(R.id.edt_comment)
     EditText rreEdt_comment;
+    @BindView(R.id.no_content_layout)
+    TextView noContentLayout;
+    /*@BindView(R.id.no_content_layout)
+    TextView noContentLayout;*/
     @Inject
     CommentPresenter presenter;
     @Inject
     RRENetworkCall rreNetworkCall;
-    private static int projecAssignId;
+    //project assign Id or user(RRE or CRRE from master app) Id.
+    private static int pa_user_Id;
     private static List<ViewActCompProject.Comment> mComment;
     private List<RREApplication.Comment> rreComment;
     private Observer<String> message;
     private String token;
     private Observer<RREComments> commentsObserver;
     private Observer<RREApplication> applicationObserver;
+    @Inject
+    Utils utils;
 
     public static IFragment newInstance(List<ViewActCompProject.Comment> comments, int id) {
         mComment = comments;
-        projecAssignId = id;
+        pa_user_Id = id;
+        return new CommentFragment();
+    }
+
+    public static IFragment newMInstance(List<RREApplication.Comment> comments, int id) {
+        mMasterComment = comments;
+        pa_user_Id = id;
         return new CommentFragment();
     }
 
@@ -79,14 +91,27 @@ public class CommentFragment extends BaseFragment implements IFragment, CommentP
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        basicSetUp();
+        if (mMasterComment != null && mMasterComment.size() > 0) {
+            rreComment = mMasterComment;
+            presenter.setRREorCRREID(pa_user_Id);
+            buildMCRREUI();
+        } else {
+            final int role = presenter.getRole();
+            if (role == 0| role ==1) {
+                basicSetUp();
+            } else {
+                // noContentLayout.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     private void basicSetUp() {
+        postCommentLayout.setVisibility(View.VISIBLE);
+        addMainButton.setVisibility(View.VISIBLE);
         token = presenter.getToken();
-        if (presenter.getRole() == 0||presenter.getRole()==2) {
+        if (presenter.getRole() == 0 || presenter.getRole() == 2) {
             postCommentLayout.setVisibility(View.GONE);
-            presenter.setData(projecAssignId);
+            presenter.setData(pa_user_Id);
             buildUI();
         } else {
 
@@ -99,13 +124,18 @@ public class CommentFragment extends BaseFragment implements IFragment, CommentP
 
                 @Override
                 public void onNext(String s) {
-                    Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();
+                    if (utils.isOnline(getContext())) {
+                        Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();
+                    }
+                    dismissProgress();
+                    rreNetworkCall.clearDisposable();
                 }
 
                 @Override
                 public void onError(Throwable e) {
 
                 }
+
                 @Override
                 public void onComplete() {
 
@@ -119,11 +149,13 @@ public class CommentFragment extends BaseFragment implements IFragment, CommentP
 
                 @Override
                 public void onNext(RREApplication rreApplication) {
+                    dismissProgress();
                     presenter.setDocumentList(rreApplication);
-                    if(presenter.getRole() == 0||presenter.getRole()==2){
+                    if (presenter.getRole() == 0 || presenter.getRole() == 2) {
                         buildUI();
-                    }else {
-                    buildRREUI();}
+                    } else {
+                        buildRREUI();
+                    }
                 }
 
                 @Override
@@ -136,7 +168,7 @@ public class CommentFragment extends BaseFragment implements IFragment, CommentP
 
                 }
             };
-             commentsObserver = new Observer<RREComments>() {
+            commentsObserver = new Observer<RREComments>() {
                 @Override
                 public void onSubscribe(Disposable d) {
 
@@ -160,14 +192,25 @@ public class CommentFragment extends BaseFragment implements IFragment, CommentP
 
                 }
             };
-            rreNetworkCall.init(getContext(), message,this);
+            rreNetworkCall.init(getContext(), message, this);
             buildRREUI();
         }
     }
 
-    private void buildRREUI() {
-        rreComment = presenter.getCommentList();
+    private void buildMCRREUI() {
         if (rreComment.size() != 0) {
+            commentContainer.removeAllViews();
+            for (RREApplication.Comment rreComment : rreComment) {
+                View inflater = presenter.setUpRREDescription(rreComment);
+                commentContainer.addView(inflater);
+            }
+        }
+    }
+
+    private void buildRREUI() {
+        dismissProgress();
+        rreComment = presenter.getCommentList();
+        if (rreComment != null && rreComment.size() != 0) {
             commentContainer.removeAllViews();
             for (RREApplication.Comment rreComment : rreComment) {
                 View inflater = presenter.setUpRREDescription(rreComment);
@@ -183,6 +226,8 @@ public class CommentFragment extends BaseFragment implements IFragment, CommentP
                 View inflater = presenter.setUpDescription(commentItem);
                 commentContainer.addView(inflater);
             }
+        }else {
+            noContentLayout.setVisibility(View.VISIBLE);
         }
     }
 
@@ -226,7 +271,8 @@ presenter.showAlert("");*/
     @Override
     public void onResume() {
         super.onResume();
-        fragmentChannel.setTitle("Project Status");
+        if(presenter.getRole()!=1){
+        fragmentChannel.setTitle("Project Status");}
     }
 
     @Override
@@ -237,7 +283,7 @@ presenter.showAlert("");*/
 
     @Override
     public void showMessage(String message) {
-        KToast.customColorToast((Activity) getContext(), message, Gravity.BOTTOM, KToast.LENGTH_SHORT, R.color.red);
+        utils.showToastMessage(getContext(), message);
     }
 
     @Override
@@ -261,7 +307,14 @@ presenter.showAlert("");*/
     public void triggerApi(int commentId, String comment) {
 
         JsonObject json = presenter.buildJson(commentId, comment);
-        rreNetworkCall.postComment(token,json,commentsObserver);
+        rreNetworkCall.postComment(token, json, commentsObserver);
+    }
+
+    @Override
+    public void updateMCRRE(List<RREApplication.Comment> comments) {
+
+        rreComment = comments;
+        buildMCRREUI();
     }
 
     @Override

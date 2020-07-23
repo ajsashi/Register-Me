@@ -3,14 +3,28 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/content_bg">
-
+    android:background="@color/content_bg"
+    android:textColor="@color/white"
+    android:layout_marginStart="15dp"
+    android:layout_marginEnd="15dp"
+    >
+    <TextView
+        android:id="@+id/sub_header"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/black"
+        android:gravity="center_vertical"
+        android:paddingLeft="20dp"
+        android:textColor="@color/white"
+        android:text="MY Library  "
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
     <LinearLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/sub_header">
 
         <TextView
             android:layout_width="match_parent"
@@ -47,12 +61,12 @@
             android:paddingBottom="5dp"
             android:text="Action"
             android:textColor="@color/text_orange" />
-    </LinearLayout>
+    </LinearLayout
+        >
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginBottom="15sp"
         android:scrollbars="none"
         app:layout_constraintBottom_toTopOf="@id/btn_layout"
         app:layout_constraintTop_toBottomOf="@id/header">
@@ -116,4 +130,15 @@
         </androidx.cardview.widget.CardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/noContentText"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:hint="No Documents Submitted!"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:gravity="center"
+        android:textSize="25sp"
+        android:visibility="gone"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

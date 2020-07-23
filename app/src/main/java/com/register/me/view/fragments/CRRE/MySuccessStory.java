@@ -37,6 +37,8 @@ public class MySuccessStory extends BaseFragment implements IFragment, Utils.Uti
 
     @BindView(R.id.txt_POffered)
     TextView txt_POffered;
+    @BindView(R.id.sub_header)
+    TextView sub_header;
     @BindView(R.id.txt_CRREBidded)
     TextView txt_CRREBidded;
     @BindView(R.id.txt_won)
@@ -103,7 +105,11 @@ public class MySuccessStory extends BaseFragment implements IFragment, Utils.Uti
 
             @Override
             public void onNext(String s) {
-                Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();
+                crreNetworkCall.clearDisposable();
+                if (utils.isOnline(getContext())) {
+                    Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();
+                }
+                dismissProgress();
             }
 
             @Override
@@ -124,6 +130,7 @@ public class MySuccessStory extends BaseFragment implements IFragment, Utils.Uti
 
             @Override
             public void onNext(Response<SuccessCertificate> successCertificateResponse) {
+                crreNetworkCall.clearDisposable();
                 scResponse = successCertificateResponse;
                 dismissProgress();
                 buildUI();
@@ -147,6 +154,7 @@ public class MySuccessStory extends BaseFragment implements IFragment, Utils.Uti
 
             @Override
             public void onNext(Response<ResponseData> responseDataResponse) {
+                crreNetworkCall.clearDisposable();
                 dismissProgress();
                 Toast.makeText(getContext(), responseDataResponse.body().getData().getMessage(), Toast.LENGTH_SHORT).show();
             }
@@ -167,6 +175,7 @@ public class MySuccessStory extends BaseFragment implements IFragment, Utils.Uti
     @Override
     public void onResume() {
         super.onResume();
+
         crreNetworkCall.getCertifyAndStory(SCObserver);
     }
 
@@ -174,6 +183,17 @@ public class MySuccessStory extends BaseFragment implements IFragment, Utils.Uti
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         showProgress();
+        if(constants.isStory())
+        {
+            sub_header.setText("Success Story");
+            fragmentChannel.setTitle("Success Story");
+        }else if(constants.isCertificate()){
+            sub_header.setText("My Certificate");
+            fragmentChannel.setTitle("My Certificate");
+        }else if(constants.isLibrary()) {
+            sub_header.setText("My Library");
+            fragmentChannel.setTitle("My Library");
+        }
     }
 
     private void buildUI() {
@@ -237,7 +257,6 @@ public class MySuccessStory extends BaseFragment implements IFragment, Utils.Uti
 
     @Override
     public void onViewItemClick(int position) {
-        Toast.makeText(getContext(), ""+position, Toast.LENGTH_SHORT).show();
         fragmentChannel.showPersonalLibrary(position);
     }
 }

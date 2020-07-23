@@ -46,12 +46,10 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
                     case 0:
                         return new PersonalInfoFragment();
                     case 1:
-//                        return new ApplicationFormFragment();
                         return new AddProductFragment();
                     case 2:
                         return new DocumentFragment();
                     case 3:
-//                        ActivityFragment()
                         return new CommentFragment();
 
                     default:

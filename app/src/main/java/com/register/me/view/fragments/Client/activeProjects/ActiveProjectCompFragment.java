@@ -13,7 +13,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.onurkaganaldemir.ktoastlib.KToast;
+
+import com.register.me.model.data.util.Utils;
 import com.register.me.view.Adapter.ProjectAdapter;
 import com.register.me.R;
 import com.register.me.model.data.model.ActiveCompProject;
@@ -55,6 +56,8 @@ public class ActiveProjectCompFragment extends BaseFragment implements IFragment
     @Inject
     ActiveCompProjectPresenter presenter;
     private boolean isActive;
+    @Inject
+    Utils utils;
 
     public static IFragment newInstance() {
         return new ActiveProjectCompFragment();
@@ -101,13 +104,12 @@ public class ActiveProjectCompFragment extends BaseFragment implements IFragment
 
     @Override
     public void showMessage(String msg) {
-        KToast.customColorToast((Activity) getContext(), msg, Gravity.BOTTOM, KToast.LENGTH_SHORT, R.color.red);
-
+        utils.showToastMessage(getContext(),msg);
     }
 
     @Override
     public void updateActiveProject(List<ActiveCompProject.ActiveProjectDetail> activeList) {
-        if (activeList.size() == 0) {
+        if (activeList==null ||activeList.size() == 0) {
             recyclerView.setVisibility(View.GONE);
             noContentLayout.setVisibility(View.VISIBLE);
             noContentTxt.setHint("No Active Projects Available!");
@@ -121,7 +123,7 @@ public class ActiveProjectCompFragment extends BaseFragment implements IFragment
 
     @Override
     public void updateCompleteProject(List<ActiveCompProject.CompletedProjectDetail> completedList) {
-        if (completedList.size() == 0) {
+        if (completedList==null||completedList.size() == 0) {
             recyclerView.setVisibility(View.GONE);
             noContentLayout.setVisibility(View.VISIBLE);
             noContentTxt.setHint("No Completed Projects Available!");
@@ -157,5 +159,10 @@ public class ActiveProjectCompFragment extends BaseFragment implements IFragment
         presenter.setId(id);
 
         fragmentChannel.showViewProductDetails();
+    }
+
+    @Override
+    public void onPayClicked(ActiveCompProject.ActiveProjectDetail actProject) {
+        fragmentChannel.showProductInfo(actProject);
     }
 }

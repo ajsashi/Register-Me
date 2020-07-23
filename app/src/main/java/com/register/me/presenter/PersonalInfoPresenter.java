@@ -2,12 +2,12 @@ package com.register.me.presenter;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.register.me.APIs.ApiInterface;
 import com.register.me.APIs.ClientNetworkCall;
-import com.register.me.R;
 import com.register.me.model.JsonBuilder;
 import com.register.me.model.data.Constants;
 import com.register.me.model.data.model.GetUserInfoModel;
@@ -26,7 +26,7 @@ import retrofit2.Retrofit;
 /**
  * Created by Jennifer - AIT on 18-02-2020PM 04:45.
  */
-public class PersonalInfoPresenter implements ClientNetworkCall.NetworkCallInterface, Utils.UtilAlertInterface,Utils.UtilNetworkInterface {
+public class PersonalInfoPresenter implements ClientNetworkCall.NetworkCallInterface, Utils.UtilAlertInterface, Utils.UtilNetworkInterface {
 
     @Inject
     Retrofit retrofit;
@@ -76,37 +76,87 @@ public class PersonalInfoPresenter implements ClientNetworkCall.NetworkCallInter
             return;
         }*/
         if (utils.isOnline(context)) {
-            if(utils.checkAlert()){
-                utils.dismissAlert();
-            }
             listener.showProgress();
             ApiInterface apiInterface = retrofit.create(ApiInterface.class);
             String token = repo.getData(constants.getcacheTokenKey());
+
             networkCall.getUserDetails(apiInterface, token, this);
         } else {
             //listener.showErrorMessage(context.getResources().getString(R.string.network_alert));
-            utils.showNetworkAlert(context,this);
+            utils.showNetworkAlert(context, this);
         }
     }
 
     public void validate(ArrayList<QandA> info) {
+        boolean isTelephone = false;
+        boolean isCellphone = false;
+
         for (QandA item : info) {
+            final String quest = item.getQuestion().toLowerCase();
             if (item.getAnswer() == null || item.getAnswer().isEmpty()) {
-                listener.showErrorMessage("Please enter " + item.getQuestion());
-                return;
+                if(!quest.equals("telephone")&&!quest.equals("cell phone")){
+                    listener.showErrorMessage("Please enter " + item.getQuestion());
+                    return;
+                }
+
             }
-            if (item.getQuestion().equals("Notification") && getRole() == 0 && item.getAnswer().equals("false")) {
+            else if (item.getQuestion().equals("Notification") && getRole() == 0 && item.getAnswer().equals("false")) {
                 listener.showErrorMessage("Please enable " + item.getQuestion());
                 return;
+            }else {
+                if(quest.equals("telephone")){
+                    isTelephone=true;
+                    break;
+                }else if(quest.equals("cell phone")){
+                    isCellphone=true;
+                    break;
+                }
             }
+
         }
-        updateUser(info);
+        if(isTelephone||isCellphone){
+            updateUser(info);
+        }else {
+            listener.showErrorMessage("Either telephone or cell phone is mandatory");
+
+        }
     }
 
+
+    /*if(item.getQuestion().toLowerCase().equals("telephone")){
+                if (item.getAnswer()== null||item.getAnswer().isEmpty()) {
+                    eitherOption =false;
+                }else {
+                    eitherOption= true;
+                }
+            }else if(item.getQuestion().toLowerCase().equals("cell phone")){
+                if ((item.getAnswer()== null||item.getAnswer().isEmpty())&&!eitherOption) {
+                    listener.showErrorMessage("Either Telephone or Cell phone is mandatory");
+                }
+            }*/
     private void updateUser(ArrayList<QandA> info) {
         JsonObject data = builder.getUserUpdateJson(info);
         Log.d("data", data.toString());
         apiCall(data);
+    }
+
+    public void checkNetStatus() {
+        if (checkNetwork()) {
+            if (!utils.checkAlert()) {
+                utils.showNetworkAlert(context, this);
+            }
+        } else {
+            if (utils.checkAlert()) {
+                utils.dismissAlert();
+            }
+        }
+    }
+
+    private boolean checkNetwork() {
+        if (!utils.isOnline(context)) {
+            return true;
+        }
+        return false;
     }
 
     private void apiCall(JsonObject data) {
@@ -116,7 +166,8 @@ public class PersonalInfoPresenter implements ClientNetworkCall.NetworkCallInter
             String token = repo.getData(constants.getcacheTokenKey());
             networkCall.updateUserInformation(apiInterface, token, data, this);
         } else {
-            listener.showErrorMessage(context.getResources().getString(R.string.network_alert));
+            utils.showNetworkAlert(context, this);
+            // listener.showErrorMessage(context.getResources().getString(R.string.network_alert));
         }
     }
 
@@ -125,6 +176,8 @@ public class PersonalInfoPresenter implements ClientNetworkCall.NetworkCallInter
     public void alertResponse(String success) {
         if (getRole() == 0) {
             listener.exitScreen();
+        }else if(success.contains("$EMAIL")){
+            Toast.makeText(context, success.replace("$EMAIL:",""), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -199,14 +252,18 @@ public class PersonalInfoPresenter implements ClientNetworkCall.NetworkCallInter
     public void sessionExpired() {
         listener.dismissProgress();
         listener.showErrorMessage("Session Expired");
-        repo.storeData(constants.getcacheIsLoggedKey(), "false");
-        repo.storeData(constants.getCACHE_USER_INFO(), null);
-        utils.sessionExpired(context);
+
+        utils.sessionExpired(context, repo);
     }
 
     @Override
     public void refreshNetwork() {
+        utils.dismissAlert();
         listener.refresh();
+    }
+
+    public void showAlert() {
+        utils.showAlert(context,25,this);
     }
 
 

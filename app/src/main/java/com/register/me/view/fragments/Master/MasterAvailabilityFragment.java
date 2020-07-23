@@ -99,10 +99,10 @@ public class MasterAvailabilityFragment extends BaseFragment implements IFragmen
     public void updateScheduleList(List<ScheduleList.Schedule> schedules) {
         if (schedules.size() > 0) {
             setAdapter(schedules);
+            no_content_layout.setVisibility(View.GONE);
         } else {
             no_content_layout.setVisibility(View.VISIBLE);
         }
-//        Toast.makeText(context, ""+schedules.size(), Toast.LENGTH_SHORT).show();
     }
 
 

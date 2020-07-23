@@ -23,7 +23,7 @@ import retrofit2.Retrofit;
 /**
  * Created by Jennifer - AIT on 03-03-2020AM 11:03.
  */
-public class ActiveAuctionPresenter implements ClientNetworkCall.NetworkCallInterface, Utils.UtilAlertInterface {
+public class ActiveAuctionPresenter implements ClientNetworkCall.NetworkCallInterface, Utils.UtilAlertInterface, Utils.UtilNetworkInterface {
 
 
     @Inject
@@ -42,6 +42,8 @@ public class ActiveAuctionPresenter implements ClientNetworkCall.NetworkCallInte
     private Context context;
     private IActiveAuction listener;
     private Integer id;
+    private boolean isList;
+    private boolean isDirect;
 
     public void init(Context context, IActiveAuction listener) {
         this.context = context;
@@ -52,13 +54,15 @@ public class ActiveAuctionPresenter implements ClientNetworkCall.NetworkCallInte
 
     public void getAuctionList() {
 //        constants.setBidList(null);
+        isList = true;
         if (utils.isOnline(context)) {
             listener.showProgress();
             String token = repo.getData(constants.getcacheTokenKey());
             ApiInterface apiInterface = retrofit.create(ApiInterface.class);
             networkCall.getAuctionList(apiInterface, token, this);
         } else {
-            listener.showMessage(context.getResources().getString(R.string.network_alert));
+            utils.showNetworkAlert(context,this);
+
         }
     }
 
@@ -87,9 +91,8 @@ public class ActiveAuctionPresenter implements ClientNetworkCall.NetworkCallInte
     @Override
     public void sessionExpired() {
         listener.showMessage("Session Expired");
-        repo.storeData(constants.getcacheIsLoggedKey(),"false");
-        repo.storeData(constants.getCACHE_USER_INFO(),null);
-        utils.sessionExpired(context);
+
+        utils.sessionExpired(context, repo);
     }
 
     public void directAssignment(Integer projectID) {
@@ -106,6 +109,7 @@ public class ActiveAuctionPresenter implements ClientNetworkCall.NetworkCallInte
     }
 
     private void apicall() {
+        isDirect=true;
         if (utils.isOnline(context)) {
             listener.showProgress();
             String token = repo.getData(constants.getcacheTokenKey());
@@ -125,6 +129,16 @@ public class ActiveAuctionPresenter implements ClientNetworkCall.NetworkCallInte
 
     public List<ActiveAuction.Bidsreadytoevaluate_> getBidList() {
         return constants.getBidList();
+    }
+
+    @Override
+    public void refreshNetwork() {
+        utils.dismissAlert();
+        if(isList){
+            getAuctionList();
+        }else if(isDirect){
+            apicall();
+        }
     }
 
 

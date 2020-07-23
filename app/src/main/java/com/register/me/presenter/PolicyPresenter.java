@@ -33,6 +33,10 @@ public class PolicyPresenter implements Utils.UtilAlertInterface {
         }
     }
 
+    public boolean isOnline() {
+        return utils.isOnline(context);
+    }
+
     public interface IPolicy{
         void showMessage(String message);
 

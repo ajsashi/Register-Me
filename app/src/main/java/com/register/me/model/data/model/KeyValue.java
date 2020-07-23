@@ -18,6 +18,10 @@ public class KeyValue {
         this.subList = subList;
     }
 
+    public KeyValue() {
+
+    }
+
     public String getKey() {
         return Key;
     }

@@ -31,17 +31,17 @@ public class VideoActivity extends YouTubeBaseActivity {
                     youTube_Player = youTubePlayer;
                     youTube_Player.loadVideo(VIDEO_CODE);
                     youTube_Player.setPlayerStyle(YouTubePlayer.PlayerStyle.DEFAULT);
-                    Toast.makeText(VideoActivity.this, youTubePlayer.getDurationMillis() + "", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(VideoActivity.this, youTubePlayer.getDurationMillis() + "", Toast.LENGTH_SHORT).show();
                     youTube_Player.setPlayerStateChangeListener(new YouTubePlayer.PlayerStateChangeListener() {
                         @Override
                         public void onLoading() {
-                            Toast.makeText(VideoActivity.this, "onLoading", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(VideoActivity.this, "onLoading", Toast.LENGTH_SHORT).show();
 
                         }
 
                         @Override
                         public void onLoaded(String s) {
-                            Toast.makeText(VideoActivity.this, "onLoaded", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(VideoActivity.this, "onLoaded", Toast.LENGTH_SHORT).show();
 
                         }
 
@@ -52,7 +52,7 @@ public class VideoActivity extends YouTubeBaseActivity {
 
                         @Override
                         public void onVideoStarted() {
-                            Toast.makeText(VideoActivity.this, "onVideoStarted", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(VideoActivity.this, "onVideoStarted", Toast.LENGTH_SHORT).show();
                         }
 
                         @Override

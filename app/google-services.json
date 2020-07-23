@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "801025057542",
+    "firebase_url": "https://registerme-aeb89.firebaseio.com",
+    "project_id": "registerme-aeb89",
+    "storage_bucket": "registerme-aeb89.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:801025057542:android:c4d7ed10c971da17deb487",
+        "android_client_info": {
+          "package_name": "com.register.me"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "801025057542-1q82gvt3rhsorkuf45ohblkr7ecisd7m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCP_n4DWDW5sr4Jwn1zCeYu6JbjMwXBJTE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "801025057542-1q82gvt3rhsorkuf45ohblkr7ecisd7m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

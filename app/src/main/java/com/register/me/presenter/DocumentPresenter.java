@@ -1,19 +1,25 @@
 package com.register.me.presenter;
 
 import android.content.Context;
+import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.register.me.model.JsonBuilder;
 import com.register.me.model.data.Constants;
 import com.register.me.model.data.model.QandA;
+import com.register.me.model.data.model.RRE;
 import com.register.me.model.data.model.RREApplication;
 import com.register.me.model.data.repository.CacheRepo;
+import com.register.me.model.data.util.Utils;
 import com.register.me.view.BaseActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+
+import okhttp3.internal.Util;
 
 public class DocumentPresenter {
     private Context context;
@@ -23,6 +29,8 @@ public class DocumentPresenter {
     CacheRepo repo;
     @Inject
     Constants constants;
+    @Inject
+    Utils utils;
     private String extension;
 
     public void init(Context context, IDocument listener) {
@@ -39,20 +47,42 @@ public class DocumentPresenter {
     }
 
     public List<RREApplication.Document> getDocuments() {
-        return constants.getApplicationData().getData().getDocument();
+
+        final RREApplication applicationData = constants.getApplicationData();
+        List<RREApplication.Document> document;
+        // For Low memory devices the data will be cleared in backgroud to handle such case following code is used.
+        if (applicationData != null) {
+            document = applicationData.getData().getDocument();
+        }else {
+            RREApplication data = new Gson().fromJson(repo.getData(constants.getCACHE_APPLICATION_DATA()), RREApplication.class);
+            document = data.getData().getDocument();
+        }
+
+        if (document != null) {
+            return document;
+        }
+        return null;
     }
 
     public String getFileName(String doc) {
         String fileName = doc;
         int slash = doc.lastIndexOf("/");
-        fileName = fileName.substring(slash+1);
+
+        fileName = fileName.substring(slash + 1);
         int dot = fileName.lastIndexOf(".");
-        extension = fileName.substring(dot);
+        if (dot == -1) {
+            extension = "";
+        } else {
+            extension = fileName.substring(dot);
+        }
         return fileName;
     }
 
     public String getExtension() {
-        return extension.replace(".","");
+        if (!extension.isEmpty()) {
+            return extension.replace(".", "");
+        }
+        return "";
     }
 
     public JsonObject getDeleteJson(RREApplication.Document doc) {
@@ -69,11 +99,29 @@ public class DocumentPresenter {
 
     public void setDocumentList(List<RREApplication.Document> document) {
 
-        constants.getApplicationData().getData().setDocument(document);
+        RREApplication applicationData = constants.getApplicationData();
+        if (applicationData == null) {
+            applicationData = new Gson().fromJson(repo.getData(constants.getCACHE_APPLICATION_DATA()), RREApplication.class);
+        }
+        if (applicationData != null) {
+            constants.getApplicationData().getData().setDocument(document);
+            repo.storeData(constants.getCACHE_APPLICATION_DATA(),new Gson().toJson(constants.getApplicationData(), RREApplication.class));
+            applicationData.getData().setDocument(document);
+        }else {
+            utils.showToastMessage(context,"Cannot Set Application Data, Check log for more info.");
+        }
+
     }
 
     public int getRole() {
         return constants.getuserRole();
+    }
+
+    public boolean getContext() {
+        if(context !=null){
+            return true;
+        }
+        return false;
     }
 
     public interface IDocument {

@@ -2,7 +2,6 @@ package com.register.me.view.fragments.RRE.policytraining;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -20,7 +19,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.bumptech.glide.Glide;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.gson.JsonObject;
-import com.onurkaganaldemir.ktoastlib.KToast;
 import com.register.me.APIs.RRENetworkCall;
 import com.register.me.R;
 import com.register.me.model.data.model.PolicyTraining;
@@ -29,8 +27,10 @@ import com.register.me.model.data.util.Utils;
 import com.register.me.presenter.PolicyPresenter;
 import com.register.me.view.BaseFragment;
 import com.register.me.view.activity.VideoActivity;
+import com.register.me.view.activity.WelcomeActivity;
 import com.register.me.view.fragmentmanager.manager.IFragment;
 
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,6 +50,10 @@ public class PolicyTrainingFragment extends BaseFragment implements IFragment, P
     View restrictView;
     @BindView(R.id.scrollView)
     ScrollView scrollView;
+    @BindView(R.id.progressBar)
+    ConstraintLayout progressBar;
+    @BindView(R.id.progressbar)
+    ConstraintLayout progressLayout;
     @BindView(R.id.next)
     TextView next;
     @BindView(R.id.count_txt)
@@ -60,7 +64,6 @@ public class PolicyTrainingFragment extends BaseFragment implements IFragment, P
     RRENetworkCall rreNetworkCall;
     private Observer<String> message;
     private Observer<PolicyTraining> questionObserver;
-    private YouTubePlayer YPlayer;
     private int i = 0;
     private int totalSize;
     PolicyTraining policy_Training;
@@ -68,6 +71,11 @@ public class PolicyTrainingFragment extends BaseFragment implements IFragment, P
     @Inject
     PolicyPresenter presenter;
     private Observer<ResponseData> statusObserver;
+    @Inject
+    Utils utils;
+    ArrayList<Boolean> isAnswered;
+    private boolean isRefreshed;
+
 
     public static IFragment newInstance() {
         return new PolicyTrainingFragment();
@@ -97,12 +105,9 @@ public class PolicyTrainingFragment extends BaseFragment implements IFragment, P
             @Override
             public void onNext(String s) {
                 try {
-                    if (s.contains("400")) {
-                        rreNetworkCall.clearDisposable();
-//                       fragmentChannel.popUp();
-                        return;
-                    }
-                    Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();
+                    if (utils.isOnline(getContext())) {
+                    Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();}
+                    dismissProgress();
                     rreNetworkCall.clearDisposable();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -157,8 +162,11 @@ public class PolicyTrainingFragment extends BaseFragment implements IFragment, P
 
             @Override
             public void onNext(ResponseData responseData) {
-                Toast.makeText(getContext(), responseData.getData().getMessage(), Toast.LENGTH_SHORT).show();
+                dismissProgress();
                 rreNetworkCall.clearDisposable();
+                Toast.makeText(getContext(), responseData.getData().getMessage(), Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(getContext(), WelcomeActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+
             }
 
             @Override
@@ -185,6 +193,8 @@ public class PolicyTrainingFragment extends BaseFragment implements IFragment, P
 
     private void buildQuestioniare(PolicyTraining.Applicationtraining applicationtraining) {
         container.removeAllViews();
+        isAnswered = new ArrayList<>();
+        int i = 0;
         for (PolicyTraining.Question item : applicationtraining.getQuestions()) {
             View view = LayoutInflater.from(getContext()).inflate(R.layout.question_item, null, false);
             TextView txtQuestion = view.findViewById(R.id.txtQuestion);
@@ -199,15 +209,23 @@ public class PolicyTrainingFragment extends BaseFragment implements IFragment, P
             rb2.setText(item.getOption2());
             rb3.setText(item.getOption3());
             rb4.setText(item.getOption4());
+
+            isAnswered.add(false);
+            int finalI = i;
             rdGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
                     RadioButton button = group.findViewById(checkedId);
                     String st = button.getText().toString();
-                    Toast.makeText(getContext(), st, Toast.LENGTH_SHORT).show();
+                    if (button != null) {
+                        isAnswered.set(finalI, true);
+                    }
+                    ;
+//                    Toast.makeText(getContext(), st, Toast.LENGTH_SHORT).show();
                 }
             });
             container.addView(view);
+            i++;
         }
 
 
@@ -222,7 +240,7 @@ public class PolicyTrainingFragment extends BaseFragment implements IFragment, P
 //            Toast.makeText(getContext(), "Clicked", Toast.LENGTH_SHORT).show();
             startActivityForResult(new Intent(getContext(), VideoActivity.class).putExtra("ID", video_Id), 1);
         });
-        Toast.makeText(getContext(), video_Id + "", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getContext(), video_Id + "", Toast.LENGTH_SHORT).show();
     }
 
     public static String getYoutubeThumbnailUrlFromVideoUrl(String videoUrl) {
@@ -265,12 +283,14 @@ public class PolicyTrainingFragment extends BaseFragment implements IFragment, P
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && data != null) {
             String status = data.getStringExtra("STATUS");
-            Toast.makeText(getContext(), status, Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getContext(), status, Toast.LENGTH_SHORT).show();
             restrictView.setVisibility(View.GONE);
             i++;
-            if (i + 1 == totalSize) {
+            if (i == totalSize) {
                 next.setText("Comment");
             }
+//            Toast.makeText(getContext(), "i : "+i +" total : "+totalSize, Toast.LENGTH_SHORT).show();
+
         }
     }
 
@@ -280,7 +300,14 @@ public class PolicyTrainingFragment extends BaseFragment implements IFragment, P
             presenter.showAlert();
             return;
         }
-        if (i + 1 <= totalSize && restrictView.getVisibility() == View.GONE) {
+        if (i <= totalSize && restrictView.getVisibility() == View.GONE) {
+
+            for (boolean val : isAnswered) {
+                if (!val) {
+                    Toast.makeText(getContext(), "Please Answer All The Question !", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
             PolicyTraining.Applicationtraining applicationtraining = policy_Training.getData().getApplicationtraining().get(i);
             buildScreen(applicationtraining);
             buildQuestioniare(applicationtraining);
@@ -296,29 +323,47 @@ public class PolicyTrainingFragment extends BaseFragment implements IFragment, P
 
     @Override
     public void showMessage(String message) {
-        KToast.customColorToast(getActivity(), message, Gravity.BOTTOM, KToast.LENGTH_SHORT, R.color.red);
+        utils.showToastMessage(getContext(), message);
     }
 
     @Override
     public void triggerApi(String success) {
         JsonObject object = new JsonObject();
         object.addProperty("comment", success);
+        showProgress();
         rreNetworkCall.trainingStatus(object, statusObserver);
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        fragmentChannel.setTitle("APPLICATION & POLICY TRAINING");
         if (policy_Training == null) {
             rreNetworkCall.init(getContext(), message, this);
             rreNetworkCall.getQuestions(questionObserver);
         } else {
+            dismissProgress();
             rreNetworkCall.checkNetStatus();
+            if (i ==4 && presenter.isOnline()&&isRefreshed) {
+                isRefreshed =false;
+                presenter.showAlert();
+            }
         }
     }
 
     @Override
     public void refreshNetwork() {
+isRefreshed = true;
         onResume();
+    }
+
+    private void showProgress() {
+        progressBar.setVisibility(View.VISIBLE);
+        progressLayout.setVisibility(View.VISIBLE);
+    }
+
+    private void dismissProgress() {
+        progressBar.setVisibility(View.GONE);
+        progressLayout.setVisibility(View.GONE);
     }
 }

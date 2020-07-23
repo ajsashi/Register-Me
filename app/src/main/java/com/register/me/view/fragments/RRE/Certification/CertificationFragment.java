@@ -18,11 +18,13 @@ import butterknife.OnClick;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
-public class CertificationFragment extends BaseFragment implements IFragment, Utils.UtilNetworkInterface {
+public class CertificationFragment extends BaseFragment implements IFragment, Utils.UtilNetworkInterface, Utils.UtilAlertInterface {
     @Inject
     RRENetworkCall rreNetworkCall;
     private Observer<String> message;
     private Observer<ResponseData> certificateObserver;
+    @Inject
+    Utils utils;
 
     public static IFragment newInstance() {
         return new CertificationFragment();
@@ -50,8 +52,8 @@ public class CertificationFragment extends BaseFragment implements IFragment, Ut
 
             @Override
             public void onNext(String s) {
-                Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();
-
+                if (utils.isOnline(getContext())) {
+                Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();}
                 rreNetworkCall.clearDisposable();
             }
 
@@ -73,9 +75,12 @@ public class CertificationFragment extends BaseFragment implements IFragment, Ut
 
             @Override
             public void onNext(ResponseData responseData) {
-                Toast.makeText(getContext(), responseData.getData().getMessage(), Toast.LENGTH_SHORT).show();
-                rreNetworkCall.sessionExpired(responseData.getData().getMessage());
-                rreNetworkCall.clearDisposable();
+//                Toast.makeText(getContext(), responseData.getData().getMessage(), Toast.LENGTH_SHORT).show();
+                String msg = responseData.getData().getMessage();
+                if (msg != null && msg.equals("Certification Completed")) {
+                    utils.showAlert(getContext(), 24, CertificationFragment.this::alertResponse);
+                }
+
             }
 
             @Override
@@ -99,5 +104,13 @@ public class CertificationFragment extends BaseFragment implements IFragment, Ut
     @Override
     public void refreshNetwork() {
         rreNetworkCall.checkNetStatus();
+    }
+
+    @Override
+    public void alertResponse(String msg) {
+        if (msg.equals("Dismiss")) {
+            rreNetworkCall.sessionExpired("Certification Completed");
+            rreNetworkCall.clearDisposable();
+        }
     }
 }

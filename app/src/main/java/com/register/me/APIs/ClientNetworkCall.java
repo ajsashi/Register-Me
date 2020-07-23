@@ -359,6 +359,11 @@ public class ClientNetworkCall {
                     case 200:
                         listener.onCallSuccess(response.body());
                         break;
+                    case 400:
+                        AddProductModel errorData = new Gson().fromJson(response.errorBody().charStream(), AddProductModel.class);
+                        String message = errorData.getData().getMessage();
+                        listener.onCallFail(message);
+                        break;
                     case 500:
                         listener.onCallFail(serverDown);
                         break;

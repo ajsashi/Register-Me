@@ -30,7 +30,7 @@ public class ApplicationSubmissionFragment extends BaseFragment implements IFrag
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         injector().inject(this);
-        fragmentChannel.setTitle(getResources().getString(R.string.rre_dashboard));
+        //fragmentChannel.setTitle(getResources().getString(R.string.rre_dashboard));
     }
 
 

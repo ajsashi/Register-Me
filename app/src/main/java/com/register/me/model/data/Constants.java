@@ -4,6 +4,7 @@ package com.register.me.model.data;
 import com.register.me.model.data.model.ActiveAuction;
 import com.register.me.model.data.model.GetProductModel;
 import com.register.me.model.data.model.RREApplication;
+import com.register.me.model.data.repository.CacheRepo;
 
 import java.util.List;
 
@@ -21,7 +22,8 @@ public class Constants {
      * 1 - Screen from Project Portfolio
      * 2 - Screen from Country List / Active Auction
      * 3 - Screen from Active Complete Project
-     * 4 - Scree from CRRE Active Auction
+     * 4 - Screen from CRRE Active Auction
+     * 5 - Screen from MCRRE Client Product View
      * */
     private int VIEW_SCREEN_FROM;
 
@@ -65,6 +67,8 @@ public class Constants {
     private String CACHE_TOKEN_TYPE = "token_type";
     private String CACHE_USER_PROFILE_URL = "profile_url";
     private String CACHE_USER_INFO = "user_profile";
+    private String CACHE_SELECTED_TAB = "selected_tab";
+    private String CACHE_APPLICATION_DATA="application_data";
 
 
 //    public static String BASE_URL = "http://192.168.88.62:8092/api/";
@@ -186,6 +190,14 @@ public class Constants {
 
     public String getCACHE_USER_INFO() {
         return CACHE_USER_INFO;
+    }
+
+    public String getCACHE_SELECTED_TAB() {
+        return CACHE_SELECTED_TAB;
+    }
+
+    public String getCACHE_APPLICATION_DATA() {
+        return CACHE_APPLICATION_DATA;
     }
 
     public String getProductID() {

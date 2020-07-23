@@ -1,8 +1,8 @@
 package com.register.me.presenter;
 
 import android.content.Context;
-import android.widget.Toast;
 
+import com.google.gson.JsonObject;
 import com.register.me.APIs.MasterNetworkCall;
 import com.register.me.model.data.model.ReqGeoRegion;
 import com.register.me.model.data.model.ResponseData;
@@ -28,6 +28,8 @@ public class RequestedRegionPresenter implements Utils.UtilNetworkInterface, Uti
     private Observer<String> message;
     private Observer<ReqGeoRegion> geoObserver;
     private Observer<ResponseData> acceptObserver;
+    private int id;
+    private Observer<ResponseData> cancelObserver;
 
     public void init(Context context, RRListener listener) {
         this.context = context;
@@ -42,7 +44,9 @@ public class RequestedRegionPresenter implements Utils.UtilNetworkInterface, Uti
             @Override
             public void onNext(String s) {
                 listener.hideProgress();
-                listener.showMessage(s);
+                if (utils.isOnline(context)) {
+                    listener.showMessage(s);
+                }
                 masterNetworkCall.clearDisposable();
             }
 
@@ -63,7 +67,7 @@ public class RequestedRegionPresenter implements Utils.UtilNetworkInterface, Uti
 
     @Override
     public void refreshNetwork() {
-listener.resume();
+        listener.resume();
     }
 
     public void getRequestedGeoList() {
@@ -75,7 +79,10 @@ listener.resume();
 
             @Override
             public void onNext(ReqGeoRegion geographicLocation) {
-                listener.updateRecyclerView(geographicLocation.getData().getRegions());
+                final List<ReqGeoRegion.Region> regions = geographicLocation.getData().getRegions();
+                if (regions != null) {
+                    listener.updateRecyclerView(regions);
+                }
                 listener.hideProgress();
                 masterNetworkCall.clearDisposable();
             }
@@ -95,17 +102,46 @@ listener.resume();
         masterNetworkCall.getReqGeoLocation(geoObserver);
     }
 
-    public void showAlertDialog() {
-        utils.showAlert(context,19,this);
+    public void showAlertDialog(String s, int i) {
+        this.id = i;
+        if (s.equals("accept")) {
+            utils.showAlert(context, 20, this);
+        } else if (s.equals("reject")) {
+            utils.showAlert(context, 21, this);
+        } else {
+            utils.showAlert(context, 19, this);
+        }
     }
 
     @Override
     public void alertResponse(String success) {
-        Toast.makeText(context, success, Toast.LENGTH_SHORT).show();
+        String response = null;
+        if (success.contains("$REJECT")) {
+            response = success;
+            success = "$REJECT";
+        }
+        switch (success) {
+            case "$ACCEPT":
+                acceptRegion(id);
+                break;
+            case "$REJECT":
+                String[] data = response.split(":");
+                JsonObject object = new JsonObject();
+                object.addProperty("id", id);
+                object.addProperty("reason", data[1]);
+                rejectRegion(object);
+                break;
+            default:
+                //Toast.makeText(context, success, Toast.LENGTH_SHORT).show();
+                break;
+
+        }
+
     }
 
     public void acceptRegion(Integer id) {
-        acceptObserver= new Observer<ResponseData>() {
+        listener.showProgress();
+        acceptObserver = new Observer<ResponseData>() {
             @Override
             public void onSubscribe(Disposable d) {
 
@@ -114,7 +150,9 @@ listener.resume();
             @Override
             public void onNext(ResponseData responseData) {
                 final String message = responseData.getData().getMessage();
-                listener.showMessage(message !=null? message:responseData.getError());
+                listener.hideProgress();
+                listener.showMessage(message != null ? message : responseData.getError());
+                masterNetworkCall.clearDisposable();
                 getRequestedGeoList();
             }
 
@@ -128,10 +166,38 @@ listener.resume();
 
             }
         };
-        masterNetworkCall.acceptReqRegion(String.valueOf(id),acceptObserver);
+        masterNetworkCall.acceptReqRegion(String.valueOf(id), acceptObserver);
     }
 
-    public void rejectRegion(Integer id) {
+    public void rejectRegion(JsonObject obj) {
+        listener.showProgress();
+        cancelObserver = new Observer<ResponseData>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(ResponseData responseData) {
+                final String message = responseData.getData().getMessage();
+                listener.hideProgress();
+                listener.showMessage(message != null ? message : responseData.getError());
+                masterNetworkCall.clearDisposable();
+                getRequestedGeoList();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                listener.hideProgress();
+                listener.showMessage(e.getMessage());
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        };
+        masterNetworkCall.cancleReqRegion(obj, cancelObserver);
     }
 
 

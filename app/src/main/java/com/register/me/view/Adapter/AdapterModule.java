@@ -42,4 +42,7 @@ public class AdapterModule {
 
     @Provides
     ReqRegionAdapter provideReqRegionAdapter(){return new ReqRegionAdapter();}
+
+    @Provides
+    AuctionsWonAdapter provideAuctionsWonAdapter(){return new AuctionsWonAdapter();}
 }

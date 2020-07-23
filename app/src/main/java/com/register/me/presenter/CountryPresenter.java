@@ -79,7 +79,6 @@ public class CountryPresenter implements Utils.UtilAlertInterface, ClientNetwork
         }
         switch (msg) {
             case "$OK$":
-
                 apiCall(1, null);
                 break;
             case "$SUCCESS$":
@@ -88,8 +87,10 @@ public class CountryPresenter implements Utils.UtilAlertInterface, ClientNetwork
             case "$ALERT$":
                 listener.showMessage("Please enter the reason for cancellation");
                 break;
+            case "$Dismiss$":
+                break;
             default:
-                throw new IllegalStateException("Unexpected value: " + msg);
+                //throw new IllegalStateException("Unexpected value: " + msg);
         }
 
     }
@@ -157,9 +158,8 @@ public class CountryPresenter implements Utils.UtilAlertInterface, ClientNetwork
     public void sessionExpired() {
         listener.dismissProgress();
         listener.showMessage("Session Expired");
-        repo.storeData(constants.getcacheIsLoggedKey(), "false");
-        repo.storeData(constants.getCACHE_USER_INFO(),null);
-        utils.sessionExpired(context);
+
+        utils.sessionExpired(context, repo);
     }
 
 

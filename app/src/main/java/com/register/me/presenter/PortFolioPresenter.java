@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.register.me.APIs.ApiInterface;
 import com.register.me.APIs.ClientNetworkCall;
-import com.register.me.R;
 import com.register.me.model.data.Constants;
 import com.register.me.model.data.model.GetProductModel;
 import com.register.me.model.data.repository.CacheRepo;
@@ -18,7 +17,7 @@ import javax.inject.Inject;
 import retrofit2.Retrofit;
 
 
-public class PortFolioPresenter implements ClientNetworkCall.NetworkCallInterface {
+public class PortFolioPresenter implements ClientNetworkCall.NetworkCallInterface, Utils.UtilNetworkInterface {
     private View view;
     private Context context;
     @Inject
@@ -31,6 +30,7 @@ public class PortFolioPresenter implements ClientNetworkCall.NetworkCallInterfac
     Utils utils;
     @Inject
     CacheRepo repo;
+    private boolean isList;
 
 
     public void init(View view, Context context) {
@@ -41,14 +41,14 @@ public class PortFolioPresenter implements ClientNetworkCall.NetworkCallInterfac
 
 
     public void getList() {
+        isList = true;
         if (utils.isOnline(context)) {
             view.showProgress();
             String token = repo.getData(constants.getcacheTokenKey());
             ApiInterface apiInterface = retrofit.create(ApiInterface.class);
             networkCall.getProductList(apiInterface, token, this);
         } else {
-            view.hideProgress();
-            view.showErroMessage(context.getResources().getString(R.string.network_alert));
+            utils.showNetworkAlert(context,this);
         }
 
     }
@@ -81,9 +81,16 @@ public class PortFolioPresenter implements ClientNetworkCall.NetworkCallInterfac
     @Override
     public void sessionExpired() {
         view.showErroMessage("Session Expired");
-        repo.storeData(constants.getcacheIsLoggedKey(), "false");
-        repo.storeData(constants.getCACHE_USER_INFO(), null);
-        utils.sessionExpired(context);
+
+        utils.sessionExpired(context, repo);
+    }
+
+    @Override
+    public void refreshNetwork() {
+        utils.dismissAlert();
+        if(isList){
+            getList();
+        }
     }
 
     public interface View {

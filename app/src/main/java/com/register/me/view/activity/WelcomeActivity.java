@@ -75,7 +75,11 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
         @Override
         public void onNext(String s) {
             dismissProgress();
-            Toast.makeText(WelcomeActivity.this, s, Toast.LENGTH_SHORT).show();
+            if (s.contains("Failed to connect")) {
+                welcomePresenter.isOnLine();
+            } else {
+                Toast.makeText(WelcomeActivity.this, s, Toast.LENGTH_SHORT).show();
+            }
         }
 
         @Override
@@ -97,7 +101,7 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
         @Override
         public void onNext(RREApplication rreApplication) {
             dismissProgress();
-            constants.setApplicationData(rreApplication);
+            welcomePresenter.setApplicationData(rreApplication);
             callHome();
 //            Toast.makeText(WelcomeActivity.this, rreApplication.getData().getComments().toString(), Toast.LENGTH_SHORT).show();
             /*questList = addProductPresenter.getRREApplication(rreApplication);
@@ -125,7 +129,7 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
             dismissProgress();
             stepFromResponse = stepsResponse;
             setUpRREHome();
-            Toast.makeText(WelcomeActivity.this, stepsResponse.toString(), Toast.LENGTH_SHORT).show();
+
         }
 
         @Override
@@ -137,7 +141,6 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
         @Override
         public void onComplete() {
 
-            Toast.makeText(WelcomeActivity.this, "Complete", Toast.LENGTH_SHORT).show();
         }
     };
     private Observer<MasterDash> dashObserver = new Observer<MasterDash>() {
@@ -174,10 +177,11 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         injector().inject(this);
+        /*byte[] test ={11,11,11,11,11};
+        String t = new String(test);
+        Log.d("trail data", t.toString());*/
         userRole = constants.getuserRole();
 
-        welcomePresenter.init(this, this);
-        welcomePresenter.getUserProfile();
     }
 
     private void setUpRREHome() {
@@ -207,7 +211,10 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
                     } else {
                         callHome();
                     }
-                    constants.setTAB(finalI + 1);
+                    final int tab = finalI + 1;
+                    constants.setTAB(tab);
+                    welcomePresenter.setTab(tab);
+
                 } else {
                     Toast.makeText(this, "Please complete your steps one by one", Toast.LENGTH_SHORT).show();
                 }
@@ -247,7 +254,9 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
             tileImg.setImageResource(tile.get(i));
             int finalI = i;
             tileImg.setOnClickListener(v -> {
-                constants.setTAB(finalI + 1);
+                final int tab = finalI + 1;
+                constants.setTAB(tab);
+                welcomePresenter.setTab(tab);
                 callHome();
             });
             mCRREDash.addView(inflatedView);
@@ -270,7 +279,9 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
             textView.setText(list.get(i).getName());
             int finalI = i;
             textView.setOnClickListener(v -> {
-                constants.setTAB(finalI + 1);
+                final int tab = finalI + 1;
+                constants.setTAB(tab);
+                welcomePresenter.setTab(tab);
                 callHome();
             });
             mCRREDash.addView(inflatedView);
@@ -285,6 +296,7 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
     @OnClick(R.id.img_tab_one)
     public void onTabOneClick() {
         constants.setTAB(1);
+        welcomePresenter.setTab(1);
         callHome();
 
     }
@@ -292,16 +304,19 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
     @OnClick(R.id.img_tab_two)
     public void onTabTwoClick() {
         constants.setTAB(2);
+        welcomePresenter.setTab(2);
     }
 
     @OnClick(R.id.img_tab_three)
     public void onTabThreeClick() {
         constants.setTAB(3);
+        welcomePresenter.setTab(3);
     }
 
     @OnClick(R.id.img_tab_four)
     public void onTabFourClick() {
         constants.setTAB(4);
+        welcomePresenter.setTab(4);
         if (constants.getuserRole() == 0) {
             callHome();
         }
@@ -310,16 +325,24 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
     @Override
     public void refreshNetwork() {
 //        Toast.makeText(this, "Refresh clicked", Toast.LENGTH_SHORT).show();
+        welcomePresenter.isOnLine();
         buildUI();
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
-        userRole = constants.getuserRole();
-        if (userRole != -1) {
-            checkRole();
+        try {
+            welcomePresenter.init(this, this);
+            welcomePresenter.getUserProfile();
+            userRole = constants.getuserRole();
+            if (userRole != -1) {
+                checkRole();
+            }
+        } catch (Exception e) {
+           Log.e("Welcome Exception : ", e.getMessage());
         }
+        //welcomePresenter.isOnLine();
     }
 
     @Override

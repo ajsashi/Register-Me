@@ -12,7 +12,7 @@
     <string name="logout">Logout</string>
     <string name="client_dashboard">CLIENT DASHBOARD</string>
     <string name="awarded_prod_dash">PRODUCT DASHBOARD</string>
-    <string name="add_product">ADD PRODUCT</string>
+    <string name="add_product">Add Product</string>
     <string name="product_registration">PRODUCT REGISTRATION</string>
     <string name="product_number">Product Number</string>
     <string name="product_name">Product Name</string>
@@ -168,7 +168,7 @@
     <string name="profile_details">PROFILE DETAILS</string>
     <string name="user_info">User Profile Information</string>
     <string name="Is_the_device_life_supporting">Is the device life supporting or life sustaining?</string>
-    <string name="Is_the_device_or_component_an_implant">Is the device life supporting or life sustaining?</string>
+    <string name="Is_the_device_or_component_an_implant">Is the device or component an implant?</string>
     <string name="are_there_any_direct_or_indirect_patient_contacting_components">Are there any direct or indirect patient contacting components?</string>
     <string name="is_the_device_digital_health_technology_or_does_it_contain_digital_health_technology">Is the device digital health technology, or does it contain digital health technology?</string>
     <string name="does_the_device_use_software_firmware">Does the device use software/firmware?</string>
@@ -183,6 +183,8 @@
     <string name="home">Home</string>
     <string name="dashboard">Dashboard</string>
     <string name="application_policy_training">Application &amp; Policy Training</string>
+    <string name="session_expired">Session Expired</string>
+    <string name="same_password_alert">New password should not be the same as old password</string>
 
     <item type="id" name="index" />
     <item type="id" name="usecase" />

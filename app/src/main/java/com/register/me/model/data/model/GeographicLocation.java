@@ -58,6 +58,9 @@ public class GeographicLocation {
 
     public class Location {
 
+        @SerializedName("id")
+        @Expose
+        private Integer id;
         @SerializedName("geographiclocation")
         @Expose
         private String geographiclocation;
@@ -67,6 +70,14 @@ public class GeographicLocation {
         @SerializedName("status")
         @Expose
         private String status;
+
+        public Integer getId() {
+            return id;
+        }
+
+        public void setId(Integer id) {
+            this.id = id;
+        }
 
         public String getGeographiclocation() {
             return geographiclocation;

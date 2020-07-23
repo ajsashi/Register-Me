@@ -1,10 +1,8 @@
 package com.register.me.view.fragments.RRE.applicationSubmission;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -22,15 +20,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.onurkaganaldemir.ktoastlib.KToast;
 import com.register.me.R;
 import com.register.me.model.data.model.QandA;
+import com.register.me.model.data.util.Utils;
 import com.register.me.presenter.PersonalInfoPresenter;
 import com.register.me.view.BaseFragment;
 import com.register.me.view.fragmentmanager.manager.IFragment;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -57,12 +54,16 @@ public class PersonalInfoFragment extends BaseFragment implements IFragment, Per
     private ArrayList<QandA> info;
     @BindView(R.id.progressbar)
     ConstraintLayout progressLayout;
+    @BindView(R.id.txt_add_bank)
+    TextView addBank;
     @BindView(R.id.chk_email)
     CheckBox emailChk;
     @BindView(R.id.chk_sms)
     CheckBox smsChk;
     @BindView(R.id.layPbar)
     ConstraintLayout layoutPbar;
+    @BindView(R.id.layout_holder)
+    ConstraintLayout layout_holder;
     @BindView(R.id.scroll)
     ScrollView scrollView;
 
@@ -71,6 +72,9 @@ public class PersonalInfoFragment extends BaseFragment implements IFragment, Per
     private boolean isExit;
     private ArrayList<QandA> subInfo;
     private ArrayList<QandA> notificaionInfo;
+    @Inject
+    Utils utils;
+    private int role;
 
     public static IFragment newInstance() {
         return new PersonalInfoFragment();
@@ -88,7 +92,8 @@ public class PersonalInfoFragment extends BaseFragment implements IFragment, Per
         super.onCreate(savedInstanceState);
         injector().inject(this);
         presenter.init(getContext(), this);
-        fragmentChannel.setTitle(getResources().getString(R.string.profile_details));
+        role = presenter.getRole();
+
 
     }
 
@@ -100,10 +105,18 @@ public class PersonalInfoFragment extends BaseFragment implements IFragment, Per
             subHeader.setVisibility(View.GONE);
             disableView.setVisibility(View.GONE);
             layoutBTN.setVisibility(View.VISIBLE);
+        } else if (presenter.getRole() == 2) {
+            disableView.setVisibility(View.GONE);
+            editImg.setVisibility(View.GONE);
+            addBank.setVisibility(View.VISIBLE);
+
         } else {
             layoutBTN.setVisibility(View.GONE);
         }
         notificaionInfo = new ArrayList<>();
+        layout_holder.setOnClickListener(v -> {
+            utils.hideKeyboard(layout_holder, getContext());
+        });
         emailChk.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -111,6 +124,7 @@ public class PersonalInfoFragment extends BaseFragment implements IFragment, Per
                     QandA n1 = notificaionInfo.get(0);
                     if (n1 != null) {
                         n1.setAnswer(String.valueOf(isChecked));
+                        notificaionInfo.set(0, n1);
                     }
                 }
             }
@@ -122,16 +136,26 @@ public class PersonalInfoFragment extends BaseFragment implements IFragment, Per
                     QandA n2 = notificaionInfo.get(1);
                     if (n2 != null) {
                         n2.setAnswer(String.valueOf(isChecked));
+                        notificaionInfo.set(1, n2);
                     }
                 }
             }
         });
+        showProgress();
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        if (role != 1) {
+            fragmentChannel.setTitle(getResources().getString(R.string.profile_details));
+        }
         presenter.getUserDetails();
+    }
+
+    @OnClick(R.id.txt_add_bank)
+    public void onAddBankClick() {
+        fragmentChannel.showBankDetails();
     }
 
     private void updateUI(ArrayList<QandA> info) {
@@ -149,12 +173,24 @@ public class PersonalInfoFragment extends BaseFragment implements IFragment, Per
 
                 case 1:
                     inflateView = LayoutInflater.from(getContext()).inflate(R.layout.item_edittext, null, false);
+                    if (inflateView == null) {
+                        return;
+                    }
                     TextView txtQuest = inflateView.findViewById(R.id.itemTxtTitle);
+
+
                     EditText txtAns = inflateView.findViewById(R.id.itemEditValue);
+                    TextView changeEmail = inflateView.findViewById(R.id.item_change_email);
                     txtQuest.setText(question);
                     txtAns.setText(answer);
+                    txtAns.setHint(question);
                     txtAns.setImeOptions(item.getAction() == 1 ? EditorInfo.IME_ACTION_NEXT : EditorInfo.IME_ACTION_DONE);
-
+                    if (question.equals("Email") && presenter.getRole() == 2) {
+                        changeEmail.setVisibility(View.VISIBLE);
+                        changeEmail.setOnClickListener(v -> {
+                            presenter.showAlert();
+                        });
+                    }
                     int inputType = item.getInputType();
                     txtAns.setInputType(presenter.getInputType(inputType));
 
@@ -190,6 +226,9 @@ public class PersonalInfoFragment extends BaseFragment implements IFragment, Per
                     break;
                 case 2:
                     inflateView = LayoutInflater.from(getContext()).inflate(R.layout.item_radio_group, null, false);
+                    if (inflateView == null) {
+                        return;
+                    }
                     TextView txtRadioView = inflateView.findViewById(R.id.itemTextTitle);
                     txtRadioView.setText(question);
                     RadioGroup group = inflateView.findViewById(R.id.rdValue);
@@ -230,6 +269,9 @@ public class PersonalInfoFragment extends BaseFragment implements IFragment, Per
                     break;
                 case 3:
                     inflateView = LayoutInflater.from(getContext()).inflate(R.layout.item_spinner, null, false);
+                    if (inflateView == null) {
+                        return;
+                    }
                     TextView txtSpinnerView = inflateView.findViewById(R.id.textSpinnerTitle);
                     txtSpinnerView.setText(question);
                     break;
@@ -257,33 +299,34 @@ public class PersonalInfoFragment extends BaseFragment implements IFragment, Per
 
     @Override
     public void showErrorMessage(String message) {
-        KToast.customColorToast((Activity) Objects.requireNonNull(getContext()), message, Gravity.BOTTOM, KToast.LENGTH_AUTO, R.color.red);
-
+        utils.showToastMessage(getContext(), message);
     }
 
     @Override
     public void updateUI(ArrayList<QandA> personalInfo, ArrayList<QandA> countryInfo) {
+        dismissProgress();
         if (isExit) {
             fragmentChannel.updateNavigation();
-            return;
+//            return;
         }
         container.removeAllViews();
         this.info = new ArrayList<QandA>();
         this.subInfo = new ArrayList<QandA>();
         this.notificaionInfo = new ArrayList<QandA>();
+
         this.info = (ArrayList<QandA>) personalInfo.clone();
         this.subInfo.addAll(countryInfo);
         updateUI(info);
         int role = presenter.getRole();
         boolean org = presenter.hasORG();
-        if ((role == 0 && !org)||role == 1) {
+        if ((role == 0 && !org) || role == 1) {
             updateUI(subInfo);
         }
         if (presenter.getRole() == 1) {
             smsChk.setVisibility(View.VISIBLE);
             notificaionInfo.clear();
-            notificaionInfo.add(new QandA("Notification", String.valueOf(presenter.isEmail()), 0, 0, 0, "emailNotification", null, null));
-            notificaionInfo.add(new QandA("Notification", String.valueOf(presenter.isSMS()), 0, 0, 0, "smsNotification", null, null));
+            notificaionInfo.add(new QandA("Notification", String.valueOf(presenter.isEmail()), 0, 0, 0, "emailnotification", null, null));
+            notificaionInfo.add(new QandA("Notification", String.valueOf(presenter.isSMS()), 0, 0, 0, "smsnotification", null, null));
             return;
         }
         notificaionInfo.clear();
@@ -321,8 +364,7 @@ public class PersonalInfoFragment extends BaseFragment implements IFragment, Per
 
     @OnClick(R.id.disableClick)
     public void disableClick() {
-        KToast.normalToast(getActivity(), getContext().getResources().getString(R.string.edit_icon_alert), Gravity.BOTTOM, KToast.LENGTH_AUTO);
-
+        utils.showToastMessage(getContext(), getContext().getResources().getString(R.string.edit_icon_alert));
     }
 
     @OnClick(R.id.img_Edit)
@@ -340,8 +382,10 @@ public class PersonalInfoFragment extends BaseFragment implements IFragment, Per
 
     @OnClick(R.id.card_update)
     public void onClickUpdate() {
-        info.addAll(subInfo);
-        info.addAll(notificaionInfo);
+        if (info.size() < 14) {
+            info.addAll(subInfo);
+            info.addAll(notificaionInfo);
+        }
         presenter.validate(info);
 //        presenter.updateUser(info);
 

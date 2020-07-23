@@ -11,6 +11,7 @@ import com.register.me.APIs.RRENetworkCall;
 import com.register.me.model.JsonBuilder;
 import com.register.me.model.data.Constants;
 import com.register.me.model.data.repository.CacheRepo;
+import com.register.me.model.data.stripe.StripeSupportManager;
 import com.register.me.model.data.util.Utils;
 
 import java.io.IOException;
@@ -87,8 +88,8 @@ public class AndroidModule {
     @Provides
     Retrofit provideRetrofit(){
         OkHttpClient client = new OkHttpClient.Builder()
-                .readTimeout(180, TimeUnit.SECONDS)
-                .connectTimeout(180,TimeUnit.SECONDS)
+                .readTimeout(2, TimeUnit.MINUTES)
+                .connectTimeout(2,TimeUnit.MINUTES)
                 .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
                 .addNetworkInterceptor(new Interceptor() {
                     @Override
@@ -130,4 +131,8 @@ public class AndroidModule {
     CacheRepo provideCacheRepo(@Named(Constants.APPLICATION_CONTEXT) Context context){
         return new CacheRepo(context);
     }
+
+    @Singleton
+    @Provides
+    StripeSupportManager provideStripeSupportManager(){return new StripeSupportManager();}
 }

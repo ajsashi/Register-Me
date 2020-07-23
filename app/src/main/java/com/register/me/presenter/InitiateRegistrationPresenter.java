@@ -41,6 +41,7 @@ public class InitiateRegistrationPresenter implements ClientNetworkCall.NetworkC
     @Inject
     JsonBuilder builder;
 
+
     private Context context;
     private InitiateRegListener listener;
     private ApiInterface apiInterface;
@@ -172,10 +173,8 @@ public class InitiateRegistrationPresenter implements ClientNetworkCall.NetworkC
     @Override
     public void sessionExpired() {
         listener.showMessage("Session Expired");
-        repo.storeData(constants.getcacheIsLoggedKey(),"false");
-        repo.storeData(constants.getCACHE_USER_INFO(),null);
 
-        utils.sessionExpired(context);
+        utils.sessionExpired(context, repo);
     }
 
     public void getCrreList(String location_id) {

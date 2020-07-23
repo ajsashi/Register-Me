@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.register.me.APIs.ApiInterface;
 import com.register.me.APIs.ClientNetworkCall;
-import com.register.me.R;
 import com.register.me.model.data.Constants;
 import com.register.me.model.data.model.ActiveCompProject;
 import com.register.me.model.data.repository.CacheRepo;
@@ -20,7 +19,7 @@ import retrofit2.Retrofit;
 /**
  * Created by Jennifer - AIT on 04-03-2020PM 05:14.
  */
-public class ActiveCompProjectPresenter implements ClientNetworkCall.NetworkCallInterface {
+public class ActiveCompProjectPresenter implements ClientNetworkCall.NetworkCallInterface, Utils.UtilNetworkInterface {
 
     @Inject
     Constants constants;
@@ -53,7 +52,7 @@ public class ActiveCompProjectPresenter implements ClientNetworkCall.NetworkCall
             ApiInterface apiInterface = retrofit.create(ApiInterface.class);
             networkCall.getACProjectList(apiInterface,token,this);
         }else {
-            listener.showMessage(context.getResources().getString(R.string.network_alert));
+           utils.showNetworkAlert(context,this);
         }
     }
 
@@ -82,9 +81,8 @@ listener.dismissProgress();
     public void sessionExpired() {
         listener.dismissProgress();
         listener.showMessage("Session Expired");
-        repo.storeData(constants.getcacheIsLoggedKey(),"false");
-        repo.storeData(constants.getCACHE_USER_INFO(),null);
-        utils.sessionExpired(context);
+
+        utils.sessionExpired(context, repo);
     }
 
     public void setId(int id) {
@@ -95,6 +93,12 @@ listener.dismissProgress();
 
     public String getUserRole() {
         return String.valueOf(constants.getuserRole());
+    }
+
+    @Override
+    public void refreshNetwork() {
+        utils.dismissAlert();
+        getActiveCompleteList();
     }
 
     public interface IACProject {

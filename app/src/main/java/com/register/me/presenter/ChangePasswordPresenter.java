@@ -55,7 +55,11 @@ public class ChangePasswordPresenter implements ClientNetworkCall.NetworkCallInt
 
         if (!ctPass.isEmpty() && !newPass.isEmpty() && !conPass.isEmpty()) {
             Matcher newMatcher = pattern.matcher(newPass);
-            if (!newMatcher.matches()) {
+            if (ctPass.equals(newPass)) {
+                listener.showErrorMessage(context.getResources().getString(R.string.same_password_alert));
+            }
+            else if(!newMatcher.matches())
+            {
                 listener.showErrorMessage(context.getResources().getString(R.string.password_alert));
             } else {
                 apicall(ctPass, newPass);
@@ -111,9 +115,8 @@ public class ChangePasswordPresenter implements ClientNetworkCall.NetworkCallInt
     @Override
     public void sessionExpired() {
         listener.showErrorMessage("Session Expired");
-        repo.storeData(constants.getcacheIsLoggedKey(), "false");
-        repo.storeData(constants.getCACHE_USER_INFO(),null);
-        utils.sessionExpired(context);
+
+        utils.sessionExpired(context, repo);
     }
 
 

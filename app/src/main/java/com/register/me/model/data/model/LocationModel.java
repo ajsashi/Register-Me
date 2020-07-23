@@ -90,6 +90,10 @@ public class LocationModel {
             this.region = region;
         }
 
+        @Override
+        public String toString() {
+            return region;
+        }
     }
 
 

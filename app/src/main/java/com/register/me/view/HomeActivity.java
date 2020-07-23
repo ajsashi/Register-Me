@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -24,17 +23,21 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.navigation.NavigationView;
-import com.onurkaganaldemir.ktoastlib.KToast;
 import com.register.me.R;
+import com.register.me.model.data.model.ActiveCompProject;
 import com.register.me.model.data.model.KeyValue;
+import com.register.me.model.data.model.RREApplication;
 import com.register.me.model.data.model.ViewActCompProject;
 import com.register.me.presenter.HomePresenter;
 import com.register.me.view.fragmentmanager.FragmentChannel;
 import com.register.me.view.fragmentmanager.manager.FragmentManagerHandler;
+import com.register.me.view.fragments.CRRE.BankDetailsFragment;
 import com.register.me.view.fragments.CRRE.CertificateFragment;
 import com.register.me.view.fragments.CRRE.MyActiveAuctionsFragment;
 import com.register.me.view.fragments.CRRE.MySuccessStory;
 import com.register.me.view.fragments.Client.DashBoardFragment;
+import com.register.me.view.fragments.Client.PaymentScreen;
+import com.register.me.view.fragments.Client.ProductInfoScreen;
 import com.register.me.view.fragments.Client.activeProjects.ActiveProjectCompFragment;
 import com.register.me.view.fragments.Client.activeProjects.ActiveProjectsFragment;
 import com.register.me.view.fragments.Client.activeProjects.CommentFragment;
@@ -47,11 +50,14 @@ import com.register.me.view.fragments.Client.portfolio.directAssignment.CRREDire
 import com.register.me.view.fragments.Client.portfolio.initiateProductRegistration.InitiateRegistrationFragment;
 import com.register.me.view.fragments.Client.portfolio.viewProductDetails.ViewProductDetailsFragment;
 import com.register.me.view.fragments.Master.AddAvailabilityFragment;
-import com.register.me.view.fragments.Master.ClientDetailFragment;
+import com.register.me.view.fragments.Master.AuctionsWonFragment;
+import com.register.me.view.fragments.Master.CRREListFragment;
+import com.register.me.view.fragments.Master.ClientListFragment;
 import com.register.me.view.fragments.Master.GeoLocationFragment;
 import com.register.me.view.fragments.Master.MasterAvailabilityFragment;
+import com.register.me.view.fragments.Master.MasterCRREListFragment;
 import com.register.me.view.fragments.Master.MasterViewDetailFragment;
-import com.register.me.view.fragments.Master.RREDetailFragment;
+import com.register.me.view.fragments.Master.RREListFragment;
 import com.register.me.view.fragments.Master.RequestedRegionFragment;
 import com.register.me.view.fragments.RRE.Certification.CertificationFragment;
 import com.register.me.view.fragments.RRE.applicationSubmission.ApplicationSubmissionFragment;
@@ -60,6 +66,7 @@ import com.register.me.view.fragments.RRE.applicationSubmission.PersonalInfoFrag
 import com.register.me.view.fragments.RRE.onlineInterview.OnlineInterviewFragment;
 import com.register.me.view.fragments.RRE.policytraining.PolicyTrainingFragment;
 import com.register.me.view.fragments.navigation.ChangePasswordFragment;
+import com.stripe.android.model.ShippingInformation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -106,11 +113,10 @@ public class HomeActivity extends BaseActivity implements HomePresenter.View, Fr
         setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         injector().inject(this);
+
         fragmentManagerHandler.setFragmentContainerId(flContainer);
         homePresenter.setView(this);
-        if (savedInstanceState == null) {
-            homePresenter.init(this);
-        }
+        homePresenter.init(this);
         navigationView.setNavigationItemSelectedListener(this);
         setNavigationHeader();
         updateProfileImage(null);
@@ -122,7 +128,7 @@ public class HomeActivity extends BaseActivity implements HomePresenter.View, Fr
         profileImage = (CircleImageView) hView.findViewById(R.id.profile_image);
         TextView profileName = (TextView) hView.findViewById(R.id.txt_profile_name);
         String profileImage = homePresenter.getProfileImage();
-        if (profileImage != null) {
+        if (!profileImage.isEmpty()) {
             Glide.with(this).load(profileImage).into(this.profileImage);
         }
 
@@ -141,6 +147,7 @@ public class HomeActivity extends BaseActivity implements HomePresenter.View, Fr
         int id = item.getItemId();
         switch (id) {
             case R.id.nav_home:
+//                showBankDetails();
                 finish();
                 break;
             case R.id.nav_change_password:
@@ -169,7 +176,7 @@ public class HomeActivity extends BaseActivity implements HomePresenter.View, Fr
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         try {
-            if (resultCode == RESULT_OK &&
+            if (requestCode==100 &&resultCode == RESULT_OK &&
                     data != null && data.getData() != null) {
                 Uri imageUri = data.getData();
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
@@ -246,8 +253,12 @@ public class HomeActivity extends BaseActivity implements HomePresenter.View, Fr
 
     @Override
     public void setTitle(String title) {
-        mBackPressed.setVisibility(View.VISIBLE);
-        mHeaderText.setText(title.toUpperCase());
+        if (mBackPressed != null) {
+            mBackPressed.setVisibility(View.VISIBLE);
+            if (mHeaderText != null) {
+                mHeaderText.setText(title.toUpperCase());
+            }
+        }
     }
 
     @Override
@@ -299,7 +310,7 @@ public class HomeActivity extends BaseActivity implements HomePresenter.View, Fr
 
     @Override
     public void showErrorMessage(String message) {
-        KToast.customColorToast(this, message, Gravity.BOTTOM, KToast.LENGTH_SHORT, R.color.red);
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
 
@@ -307,18 +318,19 @@ public class HomeActivity extends BaseActivity implements HomePresenter.View, Fr
     public void updateProfileImage(String url) {
 
         if (url == null) {
-           url = homePresenter.getProfileImage();
+            url = homePresenter.getProfileImage();
         }
         profileImage.setClickable(true);
 
         RequestOptions options = new RequestOptions()
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true);
-
-        Glide.with(this)
-                .applyDefaultRequestOptions(options)
-                .load(url)
-                .into(profileImage);
+        if (!url.isEmpty()) {
+            Glide.with(this)
+                    .applyDefaultRequestOptions(options)
+                    .load(url)
+                    .into(profileImage);
+        }
     }
 
     @Override
@@ -332,8 +344,8 @@ public class HomeActivity extends BaseActivity implements HomePresenter.View, Fr
     }
 
     @Override
-    public void showDirectAssignment() {
-        fragmentManagerHandler.replaceFragment(CRREDirectFragment.newInstance(), this);
+    public void showDirectAssignment(String productName) {
+        fragmentManagerHandler.replaceFragment(CRREDirectFragment.newInstance(productName), this);
     }
 
     @Override
@@ -354,6 +366,7 @@ public class HomeActivity extends BaseActivity implements HomePresenter.View, Fr
     @Override
     public void showRREDashboard() {
         fragmentManagerHandler.replaceFragment(ApplicationSubmissionFragment.newInstance(), this);
+        setTitle(getResources().getString(R.string.rre_dashboard));
     }
 
     @Override
@@ -374,6 +387,11 @@ public class HomeActivity extends BaseActivity implements HomePresenter.View, Fr
     @Override
     public void showCommentScreen(List<ViewActCompProject.Comment> comments, int projectAssignId) {
         fragmentManagerHandler.replaceFragment(CommentFragment.newInstance(comments, projectAssignId), this);
+    }
+
+    @Override
+    public void showMCommentScreen(List<RREApplication.Comment> comments, int projectAssignId) {
+        fragmentManagerHandler.replaceFragment(CommentFragment.newMInstance(comments, projectAssignId), this);
     }
 
     @Override
@@ -408,33 +426,49 @@ public class HomeActivity extends BaseActivity implements HomePresenter.View, Fr
 
     @Override
     public void CompletedProjects() {
-showActiveProjectsSub();
+        showActiveProjectsSub();
     }
 
     @Override
     public void showClientDetails() {
-        fragmentManagerHandler.replaceFragment(ClientDetailFragment.newInstance(),this);
+        fragmentManagerHandler.replaceFragment(ClientListFragment.newInstance(), this);
     }
 
     @Override
     public void showRREDetails() {
-        fragmentManagerHandler.replaceFragment(RREDetailFragment.newInstance(),this);
+        fragmentManagerHandler.replaceFragment(RREListFragment.newInstance(), this);
+    }
+
+    @Override
+    public void showCRREDetails() {
+        fragmentManagerHandler.replaceFragment(CRREListFragment.newInstance(), this);
+    }
+
+    @Override
+    public void showAuctionsWon() {
+        fragmentManagerHandler.replaceFragment(AuctionsWonFragment.newInstance(), this);
+    }
+
+    @Override
+    public void showMRREDetails() {
+        fragmentManagerHandler.replaceFragment(MasterCRREListFragment.newInstance(), this);
     }
 
     @Override
     public void showMasterAvailability() {
-        fragmentManagerHandler.replaceFragment(MasterAvailabilityFragment.newInstance(),this);
+        fragmentManagerHandler.replaceFragment(MasterAvailabilityFragment.newInstance(), this);
     }
 
     @Override
     public void showGeoLocation() {
-        fragmentManagerHandler.replaceFragment(GeoLocationFragment.newInstance(),this);
+        fragmentManagerHandler.replaceFragment(GeoLocationFragment.newInstance(), this);
     }
 
     @Override
     public void showRequestedRegion() {
-        fragmentManagerHandler.replaceFragment(RequestedRegionFragment.newInstance(),this);
+        fragmentManagerHandler.replaceFragment(RequestedRegionFragment.newInstance(), this);
     }
+
 
     @Override
     public void showMyActiveAuctions() {
@@ -444,32 +478,47 @@ showActiveProjectsSub();
 
     @Override
     public void showMySuccessStory() {
-fragmentManagerHandler.replaceFragment(MySuccessStory.newInstance(),this);
+        fragmentManagerHandler.replaceFragment(MySuccessStory.newInstance(), this);
     }
 
     @Override
     public void showCertificationStatus() {
-        fragmentManagerHandler.replaceFragment(CertificateFragment.newInstance(),this);
+        fragmentManagerHandler.replaceFragment(CertificateFragment.newInstance(), this);
     }
 
     @Override
     public void showPersonalLibrary(int position) {
-fragmentManagerHandler.replaceFragment(DocumentFragment.newInstance(position),this);
+        fragmentManagerHandler.replaceFragment(DocumentFragment.newInstance(position), this);
     }
 
     @Override
     public void showMasterViewDetails(Integer screen, Integer Id, String appID, ArrayList<KeyValue> list) {
-        fragmentManagerHandler.replaceFragment(MasterViewDetailFragment.newInstance(screen,Id,appID,list),this);
+        fragmentManagerHandler.replaceFragment(MasterViewDetailFragment.newInstance(screen, Id, appID, list), this);
     }
 
     @Override
     public void showAddAvailabilityFragment() {
-        fragmentManagerHandler.replaceFragment(AddAvailabilityFragment.newInstance(),this);
+        fragmentManagerHandler.replaceFragment(AddAvailabilityFragment.newInstance(), this);
     }
 
     @Override
     public void showReqRegionList() {
-        fragmentManagerHandler.replaceFragment(RequestedRegionFragment.newInstance(),this);
+        fragmentManagerHandler.replaceFragment(RequestedRegionFragment.newInstance(), this);
+    }
+
+    @Override
+    public void showProductInfo(ActiveCompProject.ActiveProjectDetail actProject) {
+        fragmentManagerHandler.replaceFragment(ProductInfoScreen.newInstance(actProject),this);
+    }
+
+    @Override
+    public void showPaymnetScreen(String nextdueamount, ShippingInformation shippingInfo) {
+        fragmentManagerHandler.replaceFragment(PaymentScreen.newInstance(nextdueamount,shippingInfo),this);
+    }
+
+    @Override
+    public void showBankDetails() {
+        fragmentManagerHandler.replaceFragment(BankDetailsFragment.newInstance(),this);
     }
 
     @Override
@@ -477,6 +526,7 @@ fragmentManagerHandler.replaceFragment(DocumentFragment.newInstance(position),th
         if (isProfileClicked) {
             isProfileClicked = false;
         }
+
         if (fragmentManagerHandler.getStack() > 0) {
             fragmentManagerHandler.onBackPressed();
         } else {
@@ -489,5 +539,17 @@ fragmentManagerHandler.replaceFragment(DocumentFragment.newInstance(position),th
         super.onResume();
 
         profileImage.setClickable(true);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d("HomeActivity", "OnPause");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d("HomeActivity", "OnPause");
     }
 }

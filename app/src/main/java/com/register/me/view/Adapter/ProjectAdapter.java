@@ -86,6 +86,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ViewHold
             pName.setText(actProject.getRegistrationexpert());
             txtBidCountry.setText(actProject.getBidamount());
                 viewIcon.setOnClickListener(view ->listener.onItemClick(actProject.getProjectId()) );
+                pay.setOnClickListener(v -> {listener.onPayClicked(actProject);});
             }
             else {
                 if(userRole.equals("2")){
@@ -132,5 +133,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ViewHold
 
     public interface ItemClickListener{
         void onItemClick(int position);
+
+        void onPayClicked(ActiveCompProject.ActiveProjectDetail actProject);
     }
 }

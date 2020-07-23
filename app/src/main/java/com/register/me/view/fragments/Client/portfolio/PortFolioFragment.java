@@ -3,7 +3,6 @@ package com.register.me.view.fragments.Client.portfolio;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -12,7 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.onurkaganaldemir.ktoastlib.KToast;
+import com.register.me.model.data.util.Utils;
 import com.register.me.view.Adapter.ProductAdapter;
 import com.register.me.R;
 import com.register.me.model.data.Constants;
@@ -24,7 +23,6 @@ import com.register.me.view.fragmentmanager.manager.IFragment;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -47,8 +45,9 @@ public class PortFolioFragment extends BaseFragment implements IFragment, PortFo
     @BindView(R.id.content_layout)
     LinearLayout contentLayout;
     @BindView(R.id.no_content_layout)
-
     LinearLayout noContentLayout;
+    @Inject
+    Utils utils;
     private Activity activity = getActivity();
 
     @Override
@@ -116,11 +115,11 @@ public class PortFolioFragment extends BaseFragment implements IFragment, PortFo
         fragmentChannel.showInitiateProductRegistration();
     }
 
-   /* @Override
-    public void onSendIconClick(int adapterPosition) {
+    @Override
+    public void onSendIconClick(int adapterPosition, String productName) {
         setConstants(adapterPosition);
-        fragmentChannel.showDirectAssignment();
-    }*/
+        fragmentChannel.showDirectAssignment(productName);
+    }
 
     @Override
     public void onCountryIconClick(int adapterPosition) {
@@ -138,18 +137,22 @@ public class PortFolioFragment extends BaseFragment implements IFragment, PortFo
         GetProductModel.Product selectedList = portFolioPresenter.checkData().get(adapterPosition);
         constants.setSelectedList(selectedList);
         constants.setProductID(String.valueOf(selectedList.getProductId()));
+        constants.setProjectID(null);
     }
 
     @Override
     public void showErroMessage(String message) {
 
-        KToast.customColorToast((Activity) Objects.requireNonNull(getContext()), message, Gravity.BOTTOM, KToast.LENGTH_SHORT, R.color.red);
+        utils.showToastMessage(getContext(),message);
     }
 
     @Override
     public void updateList(List<GetProductModel.Product> list) {
+        if(list!=null && list.size()>0){
         contentLayout.setVisibility(View.VISIBLE);
-        setAdapter(list);
+        setAdapter(list);}else {
+            noContentLayout.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override

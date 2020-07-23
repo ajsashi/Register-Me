@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -11,8 +12,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.register.me.R;
+import com.register.me.model.data.model.GeographicLocation;
 import com.register.me.model.data.model.ReqGeoRegion;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class ReqRegionAdapter extends RecyclerView.Adapter<ReqRegionAdapter.ViewHolder> {
@@ -21,11 +25,14 @@ public class ReqRegionAdapter extends RecyclerView.Adapter<ReqRegionAdapter.View
     private List<ReqGeoRegion.Region> dataList;
 
     private OnIconClickListener listener;
+    private List<ReqGeoRegion.Region> initialList;
 
 
     public void init(Context context, List<ReqGeoRegion.Region> data, OnIconClickListener listener) {
         this.context = context;
         this.listener = listener;
+        initialList=new ArrayList<>();
+        initialList.addAll(data);
         dataList = data;
 
 
@@ -42,10 +49,10 @@ public class ReqRegionAdapter extends RecyclerView.Adapter<ReqRegionAdapter.View
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ReqGeoRegion.Region region = dataList.get(position);
 
-        holder.region.setText(region.getRegion());
-        holder.description.setText(region.getDescription());
-        holder.reqBy.setText(region.getRequestedby());
-        holder.status.setText(region.getIsAccepted());
+        holder.region.setText(region.getRegion()!=null||!region.getRegion().isEmpty()? region.getRegion():"-");
+        holder.description.setText(region.getDescription()!=null||!region.getDescription().isEmpty()? region.getDescription():"-");
+        holder.reqBy.setText(region.getRequestedby()!=null||!region.getRequestedby().isEmpty()? region.getRequestedby():"-");
+        holder.status.setText(region.getIsAccepted()!=null||!region.getRegion().isEmpty()? region.getRegion():"-");
         if(region.getIsAccepted().equals("Requested")){
             holder.accept.setVisibility(View.VISIBLE);
             holder.reject.setVisibility(View.VISIBLE);
@@ -60,6 +67,40 @@ public class ReqRegionAdapter extends RecyclerView.Adapter<ReqRegionAdapter.View
     @Override
     public int getItemCount() {
         return dataList.size();
+    }
+
+    public Filter getFilter() {
+        if(dataList.size()!=initialList.size()){
+            dataList.clear();
+            dataList.addAll(initialList);
+        }
+        Filter filter = new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                List<ReqGeoRegion.Region> list = new ArrayList<>();
+                if (constraint == null || constraint.length() == 0) {
+                    list.addAll(dataList);
+                }else {
+                    String filterPattern = constraint.toString().toLowerCase().trim();
+                    for (ReqGeoRegion.Region item : dataList) {
+                        if (item.getRegion().toLowerCase().contains(filterPattern)) {
+                            list.add(item);
+                        }
+                    }
+                }
+                FilterResults results = new FilterResults();
+                results.values = list;
+                return results;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                dataList.clear();
+                dataList.addAll((List) results.values);
+                notifyDataSetChanged();
+            }
+        };
+        return filter;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

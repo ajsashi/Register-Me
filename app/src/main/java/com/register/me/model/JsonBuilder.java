@@ -33,7 +33,11 @@ public class JsonBuilder {
             if (!quest.equals("email") && !quest.equals("notification")) {
                 object.addProperty(quest, item.getAnswer());
             } else if (quest.equals("notification")) {
-                object.addProperty("emailnotification", item.getAnswer());
+                if (item.getApiKey().equals("smsnotification")) {
+                    object.addProperty("smsnotification", item.getAnswer());
+                } else {
+                    object.addProperty("emailnotification", item.getAnswer());
+                }
             }
         }
         return object;
@@ -44,7 +48,7 @@ public class JsonBuilder {
         for (QandA item : questList) {
             if (item.getSubQA() == null) {
                 setAnswer(object, item);
-            }else {
+            } else {
                 setAnswer(object, item.getSubQA());
                 setAnswer(object, item);
             }
@@ -62,18 +66,18 @@ public class JsonBuilder {
         }
     }
 
-    public JsonObject initiateBidding(ArrayList<KeyValue> map){
+    public JsonObject initiateBidding(ArrayList<KeyValue> map) {
         JsonObject object = new JsonObject();
-        for (KeyValue item : map){
-            object.addProperty(item.getKey(),item.getValue());
+        for (KeyValue item : map) {
+            object.addProperty(item.getKey(), item.getValue());
         }
         return object;
     }
 
-    public JsonObject uploadDocument(ArrayList<QandA> document){
+    public JsonObject uploadDocument(ArrayList<QandA> document) {
         JsonObject object = new JsonObject();
-        for(QandA item : document){
-            object.addProperty(item.getQuestion(),item.getAnswer());
+        for (QandA item : document) {
+            object.addProperty(item.getQuestion(), item.getAnswer());
         }
         return object;
     }

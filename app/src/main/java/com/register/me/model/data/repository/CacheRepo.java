@@ -57,6 +57,12 @@ public class CacheRepo {
         editor.apply();
         editor.commit();
     }
+
+    public void clearCacheRepo(){
+        editor.clear();
+        editor.apply();
+
+    }
 }
 
 

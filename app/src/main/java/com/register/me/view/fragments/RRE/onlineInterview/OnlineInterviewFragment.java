@@ -7,6 +7,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.gson.JsonObject;
 import com.register.me.APIs.RRENetworkCall;
@@ -39,6 +41,10 @@ public class OnlineInterviewFragment extends BaseFragment implements IFragment, 
     LinearLayout noContent;
     @BindView(R.id.avl_noContent)
     LinearLayout avlNocontent;
+    @BindView(R.id.progressBar)
+    ConstraintLayout progressBar;
+    @BindView(R.id.progressbar)
+    ConstraintLayout progressLayout;
     @Inject
     RRENetworkCall rreNetworkCall;
     @Inject
@@ -54,7 +60,9 @@ public class OnlineInterviewFragment extends BaseFragment implements IFragment, 
 
         @Override
         public void onNext(String s) {
-            Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();
+            dismissProgress();
+            if (utils.isOnline(getContext())) {
+            Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();}
             rreNetworkCall.clearDisposable();
         }
 
@@ -71,7 +79,6 @@ public class OnlineInterviewFragment extends BaseFragment implements IFragment, 
     private TimeSchedule timeSchedule;
     private Observer<ResponseData> submitCancelObserver;
     private Observer<TimeSchedule> scheduleObserver;
-
     public static IFragment newInstance() {
         return new OnlineInterviewFragment();
     }
@@ -102,9 +109,9 @@ public class OnlineInterviewFragment extends BaseFragment implements IFragment, 
 
             @Override
             public void onNext(TimeSchedule time_Schedule) {
+                dismissProgress();
                 timeSchedule = time_Schedule;
                 buildUI();
-                Toast.makeText(getContext(), timeSchedule.getData().getTime().size() + "", Toast.LENGTH_SHORT).show();
                 rreNetworkCall.clearDisposable();
             }
 
@@ -126,6 +133,7 @@ public class OnlineInterviewFragment extends BaseFragment implements IFragment, 
 
             @Override
             public void onNext(ResponseData responseData) {
+                showProgress();
                 rreNetworkCall.getAvailableTimeSchedule(scheduleObserver);
             }
 
@@ -199,13 +207,17 @@ public class OnlineInterviewFragment extends BaseFragment implements IFragment, 
     }
 
     @Override
-    public void triggerApi(JsonObject object) {
+    public void triggerApi(JsonObject object, CardView clickView) {
+        showProgress();
         rreNetworkCall.submitCancelSlot(object, submitCancelObserver);
     }
+
 
     @Override
     public void onResume() {
         super.onResume();
+        showProgress();
+        fragmentChannel.setTitle("Online Interview");
         rreNetworkCall.getAvailableTimeSchedule(scheduleObserver);
     }
 
@@ -214,10 +226,19 @@ public class OnlineInterviewFragment extends BaseFragment implements IFragment, 
         if (timeSchedule == null) {
             onResume();
         } else {
+
             rreNetworkCall.checkNetStatus();
         }
     }
+    private void showProgress() {
+        progressBar.setVisibility(View.VISIBLE);
+        progressLayout.setVisibility(View.VISIBLE);
+    }
 
+    private void dismissProgress() {
+        progressBar.setVisibility(View.GONE);
+        progressLayout.setVisibility(View.GONE);
+    }
     /*    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @OnClick(R.id.layout_date)
     public void onClickDate() {

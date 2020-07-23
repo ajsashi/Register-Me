@@ -9,13 +9,16 @@ import android.widget.Toast;
 
 import androidx.cardview.widget.CardView;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.register.me.APIs.ApiInterface;
 import com.register.me.APIs.ClientNetworkCall;
+import com.register.me.APIs.MasterNetworkCall;
 import com.register.me.R;
 import com.register.me.model.data.Constants;
 import com.register.me.model.data.model.PostReply;
 import com.register.me.model.data.model.RREApplication;
+import com.register.me.model.data.model.ResponseData;
 import com.register.me.model.data.model.ViewActCompProject;
 import com.register.me.model.data.repository.CacheRepo;
 import com.register.me.model.data.util.Utils;
@@ -27,6 +30,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 import retrofit2.Retrofit;
 
 /**
@@ -44,26 +49,29 @@ public class CommentPresenter implements Utils.UtilAlertInterface, ClientNetwork
     ClientNetworkCall networkCall;
     @Inject
     CacheRepo repo;
+    @Inject
+    MasterNetworkCall masterNetworkCall;
     private ICommentListener listener;
     private int commentId = 0;
     private int proAssignId;
     private String token;
+    private int rreOrCrreID = -1;
 
-    public void init(Context context,ICommentListener listener) {
+    public void init(Context context, ICommentListener listener) {
         this.context = context;
         this.listener = listener;
         ((BaseActivity) context).injector().inject(this);
         token = repo.getData(constants.getcacheTokenKey());
     }
 
-    public void setData(int id ) {
+    public void setData(int id) {
 
         proAssignId = id;
     }
 
     public void showAlert(String commentTopic) {
         utils.setCommentTopic(commentTopic);
-        if (getRole() == 0||getRole()==2) {
+        if (getRole() == 0 || getRole() == 2) {
             utils.showAlert(context, 10, this);
         } else {
             utils.showAlert(context, 11, this);
@@ -75,16 +83,28 @@ public class CommentPresenter implements Utils.UtilAlertInterface, ClientNetwork
         if (success.equals("$ALERT$")) {
             listener.showMessage("Please fill all the fields");
         } else {
-            if(getRole()==0 || getRole()==2){
+            final int role = getRole();
+            if (role == 0 || role == 2) {
                 String[] data = success.split(":");
-            JsonObject object = getJsonObject(data);
-            apiCall(object);
-            }else {
+                JsonObject object = getJsonObject(data);
+                apiCall(object);
+            } else if (role == 3) {
+                JsonObject object = getJsonObjectMcrre(success);
+                apiCall(object);
+            } else {
                 Toast.makeText(context, success, Toast.LENGTH_SHORT).show();
-                listener.triggerApi(getCommentId(),success);
+                listener.triggerApi(getCommentId(), success);
             }
 
         }
+    }
+
+    private JsonObject getJsonObjectMcrre(String data) {
+        JsonObject object = new JsonObject();
+        object.addProperty("id", rreOrCrreID);
+        object.addProperty("commentid", commentId);
+        object.addProperty("content", data);
+        return object;
     }
 
     private void apiCall(JsonObject object) {
@@ -93,6 +113,66 @@ public class CommentPresenter implements Utils.UtilAlertInterface, ClientNetwork
 
             ApiInterface apiInterface = retrofit.create(ApiInterface.class);
             if (object != null) {
+                if (rreOrCrreID != -1) {
+                    Observer<RREApplication> detailsOserver = new Observer<RREApplication>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onNext(RREApplication rreApplication) {
+                            listener.dismissProgress();
+                            masterNetworkCall.clearDisposable();
+                            final RREApplication.Data data = rreApplication.getData();
+                            if (data != null) {
+                                final List<RREApplication.Comment> comments = data.getComments();
+                                if (comments != null) {
+                                    listener.updateMCRRE(comments);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    };
+                    Observer<ResponseData> commentObserver = new Observer<ResponseData>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onNext(ResponseData responseData) {
+                            masterNetworkCall.clearDisposable();
+                            String data = responseData.getData().getMessage();
+                            if (data != null && !data.isEmpty()) {
+                                utils.showToastMessage(context, data);
+                            }
+                            listener.showProgress();
+                            masterNetworkCall.getDocCommentDetails(String.valueOf(rreOrCrreID), detailsOserver);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    };
+                    masterNetworkCall.postReply(object, commentObserver);
+                    return;
+                }
                 networkCall.postReply(apiInterface, token, object, this);
             } else {
                 String id = constants.getProjectID();
@@ -136,9 +216,8 @@ public class CommentPresenter implements Utils.UtilAlertInterface, ClientNetwork
     public void sessionExpired() {
         listener.dismissProgress();
         listener.showMessage("Session Expired");
-        repo.storeData(constants.getcacheIsLoggedKey(), "false");
-        repo.storeData(constants.getCACHE_USER_INFO(), null);
-        utils.sessionExpired(context);
+
+        utils.sessionExpired(context, repo);
 
     }
 
@@ -162,7 +241,6 @@ public class CommentPresenter implements Utils.UtilAlertInterface, ClientNetwork
         addComment.setOnClickListener(view1 -> {
             setCommentId(commentItem.getCommentID());
             showAlert(commentItem.getCommentTopic());
-//            Toast.makeText(context, getCommentId()+"", Toast.LENGTH_SHORT).show();
         });
 
         if (commentItem.getSubDescriptions().size() != 0) {
@@ -209,6 +287,7 @@ public class CommentPresenter implements Utils.UtilAlertInterface, ClientNetwork
         txtCreatedby.setText(rreComment.getName());
         description.setText(rreComment.getComment());
         addComment.setOnClickListener(view1 -> {
+
             setCommentId(rreComment.getId());
             showAlert("");
 //            Toast.makeText(context, getCommentId()+"", Toast.LENGTH_SHORT).show();
@@ -245,7 +324,26 @@ public class CommentPresenter implements Utils.UtilAlertInterface, ClientNetwork
     }
 
     public List<RREApplication.Comment> getCommentList() {
-        return constants.getApplicationData().getData().getComments();
+        RREApplication data = constants.getApplicationData();
+        RREApplication.Data commentData;
+        if (data != null) {
+            commentData = data.getData();
+        } else {
+            data = new Gson().fromJson(repo.getData(constants.getCACHE_APPLICATION_DATA()), RREApplication.class);
+            commentData = data.getData();
+        }
+        List<RREApplication.Comment> comment = null;
+        if (data != null) {
+            comment = commentData.getComments();
+            if (comment == null) {
+                return null;
+            }
+        }
+        if (comment != null) {
+            return comment;
+        }
+
+        return null;
     }
 
     public int getCommentId() {
@@ -257,7 +355,8 @@ public class CommentPresenter implements Utils.UtilAlertInterface, ClientNetwork
     }
 
     public int getRole() {
-        return constants.getuserRole();
+        final int role = constants.getuserRole();
+        return role;
     }
 
     public String getToken() {
@@ -266,16 +365,21 @@ public class CommentPresenter implements Utils.UtilAlertInterface, ClientNetwork
 
     public JsonObject buildJson(int i, String comment) {
         JsonObject jsonObject = new JsonObject();
-        if(i==-1){
-            i=0;
+        if (i == -1) {
+            i = 0;
         }
-        jsonObject.addProperty("commentid",i);
-        jsonObject.addProperty("content",comment);
+        jsonObject.addProperty("commentid", i);
+        jsonObject.addProperty("content", comment);
         return jsonObject;
     }
 
     public void setDocumentList(RREApplication data) {
+        repo.storeData(constants.getCACHE_APPLICATION_DATA(), new Gson().toJson(data));
         constants.setApplicationData(data);
+    }
+
+    public void setRREorCRREID(int pa_user_id) {
+        rreOrCrreID = pa_user_id;
     }
 
 
@@ -289,5 +393,7 @@ public class CommentPresenter implements Utils.UtilAlertInterface, ClientNetwork
         void dismissProgress();
 
         void triggerApi(int commentId, String success);
+
+        void updateMCRRE(List<RREApplication.Comment> comments);
     }
 }

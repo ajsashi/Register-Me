@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.cardview.widget.CardView;
 
@@ -46,7 +45,7 @@ public class OnlineInterviewPresenter {
         if (state.equals("Pending")) {
             state = "Cancel slot";
         }else if (state.equals("Cancelled")) {
-            clickView.setCardBackgroundColor(context.getColor(R.color.darker_gray_color));}
+            clickView.setCardBackgroundColor(context.getResources().getColor(R.color.darker_gray_color));}
 
 
         String finalState = state;
@@ -54,10 +53,13 @@ public class OnlineInterviewPresenter {
             if (finalState.equals("Cancelled")) {
                 clickView.setClickable(false);
             } else {
+                clickView.setClickable(false);
+                clickView.setEnabled(false);
                 JsonObject object = new JsonObject();
                 object.addProperty("id", item.getTimeid());
                 object.addProperty("action", "cancel");
-                listener.triggerApi(object);
+
+                listener.triggerApi(object,clickView);
 
             }
         });
@@ -73,15 +75,17 @@ public class OnlineInterviewPresenter {
         nameCRRE.setText(item.getName());
         dnt.setText(item.getDate());
         clickView.setOnClickListener(v -> {
+            clickView.setClickable(false);
+            clickView.setEnabled(false);
             JsonObject object = new JsonObject();
             object.addProperty("id", item.getAvailableid());
             object.addProperty("action", "submit");
-            listener.triggerApi(object);
+            listener.triggerApi(object, clickView);
         });
         return view;
     }
 
     public interface IOnlineInterview {
-        void triggerApi(JsonObject object);
+        void triggerApi(JsonObject object, CardView clickView);
     }
 }

@@ -5,6 +5,7 @@ package com.register.me.view.fragments.Client.portfolio.viewProductDetails;
  */
 
 import android.app.Activity;
+import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,6 +14,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -23,7 +25,6 @@ import androidx.annotation.RequiresApi;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.gson.JsonObject;
-import com.onurkaganaldemir.ktoastlib.KToast;
 import com.register.me.APIs.CRRENetworkCall;
 import com.register.me.R;
 import com.register.me.model.data.Constants;
@@ -74,6 +75,8 @@ public class ViewProductDetailsFragment extends BaseFragment implements IFragmen
     ScrollView scrollView;
     @BindView(R.id.layout_PSubmittedBids)
     ConstraintLayout bidLayout;
+    @BindView(R.id.viewProduct)
+    View viewProduct;
     @BindView(R.id.progressbar)
     ConstraintLayout progressLayout;
     @BindView(R.id.bid_header)
@@ -105,6 +108,7 @@ public class ViewProductDetailsFragment extends BaseFragment implements IFragmen
         screen = constants.getviewScreenFrom();
         map = new ArrayList<>();
         fragmentChannel.setTitle(getResources().getString(R.string.view_product));
+        /* if the screen value is 4 - current page is redirected from CCRE Role - Auctions in progress- View Icon*/
         if (viewProductPresenter.getScreen() == 4) {
             message = new Observer<String>() {
                 @Override
@@ -114,7 +118,10 @@ public class ViewProductDetailsFragment extends BaseFragment implements IFragmen
 
                 @Override
                 public void onNext(String s) {
-                    Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();
+                    if (utils.isOnline(getContext())) {
+                        Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();
+                    }
+                    dismissProgress();
                     crreNetworkCall.clearDisposable();
                 }
 
@@ -246,6 +253,8 @@ public class ViewProductDetailsFragment extends BaseFragment implements IFragmen
                 }
             };
 
+        } else if (viewProductPresenter.getScreen() == 5) {
+
         }
     }
 
@@ -266,16 +275,23 @@ public class ViewProductDetailsFragment extends BaseFragment implements IFragmen
     public void onResume() {
         super.onResume();
         showProgress();
-        new Handler().postDelayed(new Runnable() {
+      /*  new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (screen != 3) {
-                    viewProductPresenter.triggerApi("");
-                } else {
-                    viewProductPresenter.triggerApi("ACP");
-                }
+
             }
-        }, 150);
+        }, 150);*/
+      /*
+      * screen 3 - Client Role - Active Proojects - View Icon*/
+
+        if (screen != 3 && screen != 5) {
+            viewProductPresenter.triggerApi("");
+        } else if (screen == 5) {
+            viewProductPresenter.getMCRREProducts();
+            return;
+        } else {
+            viewProductPresenter.triggerApi("ACP");
+        }
         userRole = viewProductPresenter.getUserRole();
     }
 
@@ -336,6 +352,7 @@ public class ViewProductDetailsFragment extends BaseFragment implements IFragmen
     @OnClick(R.id.viewProduct)
     public void clickViewProduct() {
         if (contentLayout.getVisibility() == View.VISIBLE) {
+
             contentLayout.setVisibility(View.GONE);
         } else {
             contentLayout.setVisibility(View.VISIBLE);
@@ -344,13 +361,14 @@ public class ViewProductDetailsFragment extends BaseFragment implements IFragmen
 
     @OnClick(R.id.txt_check)
     public void onClickProjectStatus() {
-
         fragmentChannel.showCommentScreen(comments, viewProductPresenter.getProjectAssignId());
     }
 
     @OnClick(R.id.submit_btn)
     public void onclickSubmitBtn() {
-        crreNetworkCall.getCurrencyCode(codeObserver);
+        if(crreNetworkCall.checkNetStatus()) {
+            crreNetworkCall.getCurrencyCode(codeObserver);
+        }
 
     }
 
@@ -366,11 +384,13 @@ public class ViewProductDetailsFragment extends BaseFragment implements IFragmen
 
     @Override
     public void buildContent(ArrayList<KeyValue> kv) {
+        dismissProgress();
+        scrollView.setVisibility(View.VISIBLE);
         setContentContainerData(kv);
         boolean isActive = viewProductPresenter.getIsActive();
         if (userRole == 2 && isActive) {
             btnLayout.setVisibility(View.VISIBLE);
-        } else if(userRole == 2 && !isActive&&viewProductPresenter.getBidStatus().equals("Submitted")) {
+        } else if (userRole == 2 && !isActive && viewProductPresenter.getBidStatus().equals("Submitted")) {
             canceltBtnLayout.setVisibility(View.VISIBLE);
         }
     }
@@ -385,8 +405,7 @@ public class ViewProductDetailsFragment extends BaseFragment implements IFragmen
 
     @Override
     public void showErroMessage(String message) {
-        KToast.customColorToast((Activity) getContext(), message, Gravity.BOTTOM, KToast.LENGTH_SHORT, R.color.red);
-    }
+        utils.showToastMessage(getContext(),message);      }
 
     @Override
     public void buildTransactionUI(List<ViewActCompProject.Paymentdetail> paymentdetails) {
@@ -421,14 +440,21 @@ public class ViewProductDetailsFragment extends BaseFragment implements IFragmen
     }
 
     @Override
+    public void onresume() {
+       /* if (viewProductPresenter.getScreen() == 5) {
+            viewProductPresenter.getMCRREProducts();
+        }*/
+       onResume();
+    }
+
+    @Override
     public void alertResponse(String success) {
         if (success.equals("$DECLINE")) {
             crreNetworkCall.declineBid(constants.getProjectID(), declineObserver);
         } else if (success.contains("$TRIGGERAPI$.")) {
             success = success.replace("$TRIGGERAPI$.", "");
             crreNetworkCall.convertCurrency(success, currencyObserver);
-        }
-        else if (success.contains("$SUBMITBID$")) {
+        } else if (success.contains("$SUBMITBID$")) {
             success = success.replace("$SUBMITBID$", "");
             String[] splitData = success.split(":");
             ArrayList<String> key = new ArrayList<>();
@@ -449,19 +475,19 @@ public class ViewProductDetailsFragment extends BaseFragment implements IFragmen
         } else if (success.contains("$CANCEL")) {
             showProgress();
             String[] data = success.split(":");
-            Log.d("Data",data.length+"");
+            Log.d("Data", data.length + "");
             JsonObject object = new JsonObject();
             object.addProperty("projectid", constants.getProjectID());
             object.addProperty("cancelremarks", data[1]);
-            crreNetworkCall.cancelBid(object,cancelObserver);
-            Toast.makeText(getContext(), success, Toast.LENGTH_SHORT).show();
+            crreNetworkCall.cancelBid(object, cancelObserver);
+           //Toast.makeText(getContext(), success, Toast.LENGTH_SHORT).show();
         } else if (success.equals("$ALERT$")) {
             Toast.makeText(getContext(), "Please fill all the fields", Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
-    public void refreshNetwork(){
+    public void refreshNetwork() {
         onResume();
     }
 }

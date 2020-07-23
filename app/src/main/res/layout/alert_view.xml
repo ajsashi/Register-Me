@@ -130,6 +130,7 @@
         android:visibility="gone">
 
         <TextView
+            android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -142,6 +143,7 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/s_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -711,6 +713,7 @@
             android:layout_height="35dp"
             android:layout_marginStart="15dp"
             android:layout_marginEnd="20dp"
+            android:inputType="number"
             android:background="@drawable/shape_oval"
             android:paddingStart="20dp"
             android:paddingEnd="20dp" />
@@ -856,17 +859,17 @@
             android:layout_marginStart="15dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="15dp"
-            android:background="@drawable/shape_oval"
-            >
+            android:background="@drawable/shape_oval">
+
             <Spinner
                 android:id="@+id/countrySpinner"
                 android:layout_width="match_parent"
-                android:paddingStart="15dp"
+                android:layout_height="match_parent"
                 android:dropDownWidth="200dp"
                 android:minHeight="80dp"
-                android:spinnerMode="dropdown"
                 android:overlapAnchor="false"
-                android:layout_height="match_parent"/>
+                android:paddingStart="15dp"
+                android:spinnerMode="dropdown" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 
@@ -938,8 +941,8 @@
             android:layout_marginTop="20dp"
             android:layout_marginEnd="15dp"
             android:background="@drawable/shape_editbox_bg"
-            android:inputType="textMultiLine"
             android:gravity="top|left"
+            android:inputType="textMultiLine"
             android:paddingStart="15dp"
             android:paddingTop="5dp"
             android:paddingEnd="50dp"
@@ -947,7 +950,13 @@
             android:textSize="15sp"
             android:textStyle="bold" />
 
-
+        <LinearLayout
+            android:id="@+id/eligibleLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="10dp"
+            android:visibility="gone">
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -959,6 +968,7 @@
             android:textColor="@color/text_orange"
             android:textSize="18sp"
             android:textStyle="bold" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -992,6 +1002,33 @@
                 android:text="NO" />
 
         </LinearLayout>
+        </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/geoLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="10dp"
+            android:visibility="gone">
+
+            <include
+                layout="@layout/item_multispinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp" />
+
+            <Button
+                android:id="@+id/btn_inter_submit"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/shape_oval"
+                android:text="Submit" />
+
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

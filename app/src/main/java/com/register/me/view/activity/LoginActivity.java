@@ -2,13 +2,15 @@ package com.register.me.view.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
-
-import com.onurkaganaldemir.ktoastlib.KToast;
 import com.register.me.R;
 import com.register.me.model.data.Constants;
 import com.register.me.model.data.repository.CacheRepo;
@@ -46,6 +48,16 @@ public class LoginActivity extends BaseActivity implements LoginPresenter.ILogin
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         injector().inject(this);
+
+        /*Display display = getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
+
+        float density  = getResources().getDisplayMetrics().density;
+        float dpHeight = outMetrics.heightPixels / density;
+        float dpWidth  = outMetrics.widthPixels / density;
+
+        Log.d("Screen",dpWidth +"x"+dpHeight);*/
         presenter.init(this, this);
         if (presenter.isLoggedIn()) {
             navigate();
@@ -82,8 +94,7 @@ public class LoginActivity extends BaseActivity implements LoginPresenter.ILogin
 
     @Override
     public void showErroMessage(String message) {
-        KToast.customColorToast(this, message, Gravity.BOTTOM, KToast.LENGTH_SHORT, R.color.red);
-    }
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();    }
 
     @Override
     public void showProgress() {

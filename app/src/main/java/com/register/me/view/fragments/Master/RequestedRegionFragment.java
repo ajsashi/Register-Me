@@ -2,8 +2,11 @@ package com.register.me.view.fragments.Master;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -14,9 +17,10 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.onurkaganaldemir.ktoastlib.KToast;
+
 import com.register.me.R;
 import com.register.me.model.data.model.ReqGeoRegion;
+import com.register.me.model.data.util.Utils;
 import com.register.me.presenter.RequestedRegionPresenter;
 import com.register.me.view.Adapter.ReqRegionAdapter;
 import com.register.me.view.BaseFragment;
@@ -49,6 +53,10 @@ public class RequestedRegionFragment extends BaseFragment implements IFragment, 
     @Inject
     ReqRegionAdapter adapter;
     private Context context;
+    @BindView(R.id.edt_search)
+    EditText edtSearch;
+    @Inject
+    Utils utils;
 
 
     public static IFragment newInstance() {
@@ -72,10 +80,29 @@ public class RequestedRegionFragment extends BaseFragment implements IFragment, 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        presenter.getRequestedGeoList();
+       presenter.getRequestedGeoList();
+        edtSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+adapter.getFilter().filter(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
 
-
+    @OnClick(R.id.img_close)
+    public void onImageClose(){
+        edtSearch.setText("");
+    }
     private void setAdapter(List<ReqGeoRegion.Region> list) {
         recyclerView.setVisibility(View.VISIBLE);
         adapter.init(context, list, this);
@@ -87,17 +114,17 @@ public class RequestedRegionFragment extends BaseFragment implements IFragment, 
 
     @OnClick(R.id.add_geo_location)
     public void onAddGeoClick() {
-        presenter.showAlertDialog();
+        presenter.showAlertDialog("",-1);
     }
 
     @Override
     public void showMessage(String s) {
-        KToast.customColorToast(getActivity(), s, Gravity.BOTTOM, KToast.LENGTH_SHORT, R.color.red);
-    }
+        utils.showToastMessage(getContext(),s);    }
 
     @Override
     public void updateRecyclerView(List<ReqGeoRegion.Region> locations) {
-        if (locations.size() > 0) {
+        final int size = locations.size();
+        if (size> 0) {
             setAdapter(locations);
         } else {
             noContentLayout.setVisibility(View.VISIBLE);
@@ -106,6 +133,7 @@ public class RequestedRegionFragment extends BaseFragment implements IFragment, 
 
     @Override
     public void resume() {
+        showProgress();
         presenter.getRequestedGeoList();
     }
 
@@ -125,12 +153,12 @@ public class RequestedRegionFragment extends BaseFragment implements IFragment, 
 
     @Override
     public void onAccept(Integer id) {
-presenter.acceptRegion(id);
+        presenter.showAlertDialog("accept",id);
     }
 
     @Override
     public void onReject(Integer id) {
-presenter.rejectRegion(id);
+presenter.showAlertDialog("reject",id);
     }
 
     @Override

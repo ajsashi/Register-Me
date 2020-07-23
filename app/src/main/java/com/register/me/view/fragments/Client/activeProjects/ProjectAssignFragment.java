@@ -1,27 +1,27 @@
 package com.register.me.view.fragments.Client.activeProjects;
 
-import android.os.Bundle;
-import android.view.Gravity;
-import android.view.View;
-import android.widget.Spinner;
-import android.widget.TextView;
+        import android.os.Bundle;
+        import android.view.Gravity;
+        import android.view.View;
+        import android.widget.Spinner;
+        import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+        import androidx.annotation.NonNull;
+        import androidx.annotation.Nullable;
 
-import com.onurkaganaldemir.ktoastlib.KToast;
-import com.register.me.view.Adapter.SpinAdapter;
-import com.register.me.R;
-import com.register.me.model.data.model.CrreList;
-import com.register.me.presenter.ProjectAssignPresenter;
-import com.register.me.view.BaseFragment;
-import com.register.me.view.fragmentmanager.manager.IFragment;
+        import com.register.me.model.data.util.Utils;
+        import com.register.me.view.Adapter.SpinAdapter;
+        import com.register.me.R;
+        import com.register.me.model.data.model.CrreList;
+        import com.register.me.presenter.ProjectAssignPresenter;
+        import com.register.me.view.BaseFragment;
+        import com.register.me.view.fragmentmanager.manager.IFragment;
 
-import java.util.List;
+        import java.util.List;
 
-import javax.inject.Inject;
+        import javax.inject.Inject;
 
-import butterknife.BindView;
+        import butterknife.BindView;
 
 /**
  * Created by Jennifer - AIT on 10-03-2020PM 04:32.
@@ -41,6 +41,8 @@ public class ProjectAssignFragment extends BaseFragment implements IFragment, Pr
     static String pName;
     static int locationId;
     private SpinAdapter<CrreList.Expertlist> adapter;
+    @Inject
+    Utils utils;
 
     public static IFragment newInstance(String name, int locationid,String locName) {
         pName = name;
@@ -76,9 +78,7 @@ public class ProjectAssignFragment extends BaseFragment implements IFragment, Pr
 
     @Override
     public void showMessage(String message) {
-        KToast.customColorToast(getActivity(), message, Gravity.BOTTOM, KToast.LENGTH_SHORT, R.color.red);
-
-    }
+        utils.showToastMessage(getContext(),message);    }
 
     @Override
     public void updateSPinner(List<CrreList.Expertlist> data) {

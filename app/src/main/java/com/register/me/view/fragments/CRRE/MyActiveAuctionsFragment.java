@@ -39,6 +39,8 @@ public class MyActiveAuctionsFragment extends BaseFragment implements IFragment,
     ConstraintLayout progressBar;
     @BindView(R.id.no_content_layout)
     LinearLayout no_content_layout;
+    @Inject
+    Utils utils;
 
     @Inject
     CRRENetworkCall crreNetworkCall;
@@ -51,6 +53,7 @@ public class MyActiveAuctionsFragment extends BaseFragment implements IFragment,
     private MyActiveAuction activeList;
     private MyAuctionInProgress inProgressList;
     private Observer<MyAuctionInProgress> inprogressObservable;
+    private boolean activeAuction;
 
     public static IFragment newInstance() {
         return new MyActiveAuctionsFragment();
@@ -70,6 +73,7 @@ public class MyActiveAuctionsFragment extends BaseFragment implements IFragment,
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         injector().inject(this);
+         activeAuction = constants.isActiveAuction();
         message = new Observer<String>() {
             @Override
             public void onSubscribe(Disposable d) {
@@ -78,7 +82,10 @@ public class MyActiveAuctionsFragment extends BaseFragment implements IFragment,
 
             @Override
             public void onNext(String s) {
-                Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();
+                dismissProgress();
+                if (utils.isOnline(getContext())) {
+                    Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();
+                }
                 crreNetworkCall.clearDisposable();
             }
 
@@ -133,7 +140,7 @@ public class MyActiveAuctionsFragment extends BaseFragment implements IFragment,
 
                 inProgressList = myAuctionInProgress;
                 List<MyAuctionInProgress.BiddingProgressDetail> dataList = inProgressList.getData().getBiddingProgressDetails();
-                if (dataList != null || dataList.size() > 0) {
+                if (dataList != null && dataList.size() > 0) {
                     setAdapter();
                 } else {
                     recyclerView.setVisibility(View.GONE);
@@ -156,7 +163,8 @@ public class MyActiveAuctionsFragment extends BaseFragment implements IFragment,
     }
 
     private void setAdapter() {
-        if (constants.isActiveAuction()) {
+
+        if (activeAuction) {
             adapter.init(activeList.getData().getActiveBiddingdetails(), this);
         } else {
             adapter.subInit(inProgressList.getData().getBiddingProgressDetails(), this);
@@ -177,9 +185,11 @@ public class MyActiveAuctionsFragment extends BaseFragment implements IFragment,
     public void onResume() {
         super.onResume();
         crreNetworkCall.init(getContext(), message, this);
-        if (constants.isActiveAuction()) {
+        if (activeAuction) {
+            fragmentChannel.setTitle("Active Auctions");
             crreNetworkCall.getMyActiveAucitons(auctionObservable);
         } else {
+            fragmentChannel.setTitle("Auctions InProgress");
             crreNetworkCall.getMyAuctionInProgress(inprogressObservable);
         }
     }

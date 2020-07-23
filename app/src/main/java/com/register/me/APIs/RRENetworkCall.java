@@ -1,17 +1,13 @@
 package com.register.me.APIs;
 
 import android.content.Context;
-
-import androidx.annotation.UiThread;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.register.me.R;
 import com.register.me.model.data.Constants;
-import com.register.me.model.data.model.ActiveAuction;
 import com.register.me.model.data.model.ApplicationRRESubmission;
 import com.register.me.model.data.model.Error;
-import com.register.me.model.data.model.MyActiveAuction;
 import com.register.me.model.data.model.PolicyTraining;
 import com.register.me.model.data.model.RREApplication;
 import com.register.me.model.data.model.RREComments;
@@ -49,6 +45,7 @@ public class RRENetworkCall {
     private String token;
     private CompositeDisposable compositeDisposable;
     private Utils.UtilNetworkInterface listener;
+    private String errorMessage;
 
     public void init(Context context, Observer<String> message, Utils.UtilNetworkInterface listener) {
         this.context = context;
@@ -66,11 +63,13 @@ public class RRENetworkCall {
     }
 
     public void getStepStatus(Observer<Integer> getStepObserver) {
+        if (!checkNetStatus()) {
+            return;
+        }
         Observable<Response<Steps>> observable = retrofitBuilder.getStepStatus(token)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.computation()).
                         observeOn(AndroidSchedulers.mainThread());
-        checkNetStatus();
         Disposable disposable = observable.subscribe(stepsResponse -> {
             int code = stepsResponse.code();
 
@@ -98,12 +97,14 @@ public class RRENetworkCall {
     }
 
     public void viewRREApplication(Observer<RREApplication> getApplicationObserver) {
+        if (!checkNetStatus()) {
+            return;
+        }
         Observable<Response<RREApplication>> observable = retrofitBuilder.getRREApplication(token)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread());
 
-        checkNetStatus();
         Disposable disposable = observable.subscribe(response -> {
                     int code = response.code();
                     switch (code) {
@@ -130,13 +131,14 @@ public class RRENetworkCall {
     }
 
     public void submitRREApplication(JsonObject data, Observer<ApplicationRRESubmission> submitObserver) {
-        checkNetStatus();
+        if (!checkNetStatus()) {
+            return;
+        }
         Observable<Response<ApplicationRRESubmission>> observable = retrofitBuilder.submitRREApplicationForm(token, data)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread());
 
-        checkNetStatus();
         Disposable disposable = observable.subscribe(response -> {
 
             int code = response.code();
@@ -163,13 +165,19 @@ public class RRENetworkCall {
 
     }
 
-    public void uploadDocument(String token, JsonObject json, Observer<UploadDoc> uploadDocObserver) {
+    public void uploadDocument(Context context, Observer<String> messageObserver, Utils.UtilNetworkInterface networkInterface, String token, JsonObject json, Observer<UploadDoc> uploadDocObserver) {
+        this.context = context;
+        this.messageObserver = messageObserver;
+        this.listener = networkInterface;
+        if (!checkNetStatus()) {
+            return;
+        }
         Observable<Response<UploadDoc>> observable = retrofitBuilder.uploadDoc(token, json)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread());
 
-        checkNetStatus();
+
         Disposable disposable = observable.subscribe(response -> {
             int code = response.code();
             switch (code) {
@@ -188,6 +196,7 @@ public class RRENetworkCall {
 //                    throw new IllegalStateException("Unexpected Error: " + code);
             }
         }, error -> {
+            Log.d("OkHttp -------", error.getLocalizedMessage());
             errorMessage(error.getMessage());
         });
         compositeDisposable.add(disposable);
@@ -195,12 +204,14 @@ public class RRENetworkCall {
     }
 
     public void postComment(String token, JsonObject json, Observer<RREComments> commentsObserver) {
+        if (!checkNetStatus()) {
+            return;
+        }
         Observable<Response<RREComments>> observable = retrofitBuilder.rrePostReply(token, json)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread());
 
-        checkNetStatus();
         Disposable disposable = observable.subscribe(response -> {
             int code = response.code();
             switch (code) {
@@ -228,12 +239,13 @@ public class RRENetworkCall {
     }
 
     public void getAvailableTimeSchedule(Observer<TimeSchedule> scheduleObserver) {
+        if (!checkNetStatus()) {
+            return;
+        }
         Observable<Response<TimeSchedule>> observable = retrofitBuilder.getAvailableTime(token)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread());
-
-        checkNetStatus();
         Disposable disposable = observable.subscribe(response -> {
             int code = response.code();
             switch (code) {
@@ -260,12 +272,14 @@ public class RRENetworkCall {
     }
 
     public void submitCancelSlot(JsonObject object, Observer<ResponseData> slotObserver) {
+        if (!checkNetStatus()) {
+            return;
+        }
         Observable<Response<ResponseData>> observable = retrofitBuilder.submitCancelSchedule(token, object)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread());
 
-        checkNetStatus();
         Disposable disposable = observable.subscribe(response -> {
             int code = response.code();
             switch (code) {
@@ -293,12 +307,14 @@ public class RRENetworkCall {
     }
 
     public void getQuestions(Observer<PolicyTraining> questionObserver) {
+        if (!checkNetStatus()) {
+            return;
+        }
         Observable<Response<PolicyTraining>> observable = retrofitBuilder.getTrainingQuetions(token)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread());
 
-        checkNetStatus();
         Disposable disposable = observable.subscribe(response -> {
             int code = response.code();
             switch (code) {
@@ -325,12 +341,14 @@ public class RRENetworkCall {
     }
 
     public void trainingStatus(JsonObject object, Observer<ResponseData> statusObserver) {
+        if (!checkNetStatus()) {
+            return;
+        }
         Observable<Response<ResponseData>> observable = retrofitBuilder.postTrainingStatus(token, object)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread());
 
-        checkNetStatus();
         Disposable disposable = observable.subscribe(response -> {
             int code = response.code();
             switch (code) {
@@ -356,12 +374,14 @@ public class RRENetworkCall {
     }
 
     public void submitCertificate(Observer<ResponseData> certificateObserver) {
+        if (!checkNetStatus()) {
+            return;
+        }
         Observable<Response<ResponseData>> observable = retrofitBuilder.submitCertificate(token)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread());
 
-        checkNetStatus();
         Disposable disposable = observable.subscribe(response -> {
             int code = response.code();
             switch (code) {
@@ -387,7 +407,9 @@ public class RRENetworkCall {
     }
 
     private void errorMessage(String s) {
-        Observable<String> messageObs = Observable.just(s);
+        errorMessage = s;
+       // checkNetStatus();
+        Observable<String> messageObs = Observable.just(errorMessage);
         messageObs.subscribe(messageObserver);
     }
 
@@ -397,9 +419,7 @@ public class RRENetworkCall {
         }
         Observable<String> messageObs = Observable.just(message);
 
-        repo.storeData(constants.getcacheIsLoggedKey(), "false");
-        repo.storeData(constants.getCACHE_USER_INFO(), null);
-        utils.sessionExpired(context);
+        utils.sessionExpired(context, repo);
         messageObs.subscribe(messageObserver);
     }
 
@@ -407,15 +427,24 @@ public class RRENetworkCall {
         compositeDisposable.clear();
     }
 
-    public void checkNetStatus() {
+    public synchronized boolean checkNetStatus() {
         if (checkNetwork()) {
-            if(!utils.checkAlert()){
-                utils.showNetworkAlert(context, listener);}
+            if (!utils.checkAlert()) {
+                utils.showNetworkAlert(context, listener);
+
+            }
+            return false;
         } else {
             if (utils.checkAlert()) {
                 utils.dismissAlert();
             }
         }
+        /*if(errorMessage!=null) {
+            Observable<String> messageObs = Observable.just(errorMessage);
+            messageObs.subscribe(messageObserver);
+            errorMessage=null;
+        }*/
+        return true;
     }
 
     private boolean checkNetwork() {

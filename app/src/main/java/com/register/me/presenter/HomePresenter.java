@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.util.Base64;
-import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 
@@ -33,13 +32,14 @@ import retrofit2.Retrofit;
 
 import static androidx.core.app.ActivityCompat.requestPermissions;
 
-public class HomePresenter implements Utils.UtilAlertInterface, ClientNetworkCall.NetworkCallInterface {
+public class HomePresenter implements Utils.UtilAlertInterface, ClientNetworkCall.NetworkCallInterface, Utils.UtilNetworkInterface {
 
     private final int PICK_FROM_GALLERY = 100;
     private View view;
     @Inject
     Constants constants;
     private Context context;
+    private static int selectedTab = -1;
     @Inject
     Utils utils;
     @Inject
@@ -56,15 +56,20 @@ public class HomePresenter implements Utils.UtilAlertInterface, ClientNetworkCal
 
     }
 
+    //    init function defines the home screen display and click events based on client, rre, crre, and mcrre role
     public void init(Context context) {
         this.context = context;
         ((BaseActivity) context).injector().inject(this);
         apiInterface = retrofit.create(ApiInterface.class);
         int role = constants.getuserRole();
         int tab = constants.getTAB();
+
         switch (role) {
+            /*Client screen*/
+            /*Switch case are the tab number in Client Home Screen*/
             case 0:
                 switch (tab) {
+                    /*Redirects to Tab New Product*/
                     case 1:
                         constants.setSelectedList(null);
                         view.showNewProject();
@@ -73,109 +78,164 @@ public class HomePresenter implements Utils.UtilAlertInterface, ClientNetworkCal
                         break;
                     case 3:
                         break;
+                    /*Redirects to Tab Dashboard*/
                     case 4:
                         view.showClientDashBoard();
                         break;
                     default:
-                        throw new IllegalStateException("Unexpected value: " + tab);
+                        //resetData();
                 }
+
                 break;
+            /*RRE screen*/
+            /*Switch case are the tab number in RRE Home Screen*/
             case 1:
                 switch (tab) {
+                    /*Redirects to Tab Application Submission*/
                     case 1:
                         view.showRREDashBoard();
                         break;
                     case 2:
+                        /*Redirects to Tab Online InterView */
                         view.showOnlineInter();
                         break;
                     case 3:
+                        /*Redirects to Tab Policy Training*/
                         view.showPolicyTraining();
                         break;
                     case 4:
+                        /*Redirects to Tab Certificate*/
                         view.showCertification();
                         break;
                     default:
-                        throw new IllegalStateException("Unexpected value: " + tab);
+                        resetData();
                 }
                 break;
+            /*CRRE Screen*/
+            /*Switch case are the tab number in CRRE Home Screen*/
             case 2:
                 switch (tab) {
+                    /*Redirects to Tab My Active Auction*/
                     case 1:
                         constants.setActiveAuction(true);
                         view.ActiveAuctions();
                         break;
+                    /*Redirects to Tab Auction InProgress*/
                     case 2:
                         constants.setActiveAuction(false);
                         view.ActiveAuctions();
                         break;
+                    /*Redirects to Tab Active Project*/
                     case 3:
                         constants.setAcitiveProject(true);
                         view.ActiveProjects();
                         break;
+                    /*Redirects to Tab Completed Project*/
                     case 4:
                         constants.setAcitiveProject(false);
                         view.CompletedProjects();
                         break;
+                    /*Redirects to Tab My Success Story*/
                     case 5:
                         constants.setStory(true);
                         constants.setCertificate(false);
                         constants.setLibrary(false);
                         view.showStory();
                         break;
+                    /*Redirects to Tab Certificate Status*/
                     case 6:
                         constants.setStory(false);
                         constants.setCertificate(true);
                         constants.setLibrary(false);
                         view.showStory();
                         break;
+                    /*Redirects to Tab Library */
                     case 7:
                         constants.setStory(false);
                         constants.setCertificate(false);
                         constants.setLibrary(true);
                         view.showStory();
-                        Toast.makeText(context, "7", Toast.LENGTH_SHORT).show();
                         break;
 
                     default:
-                        throw new IllegalStateException("Unexpected value: " + tab);
+                        //resetData();
                 }
+
                 break;
+            /*Master CRRE Screen*/
+            /*Switch case are the tab number in Master CRRE Home Screen*/
             case 3:
-                switch (tab){
+                switch (tab) {
+                    /*Redirects to Tab Client Details */
                     case 1:
                         constants.setMasterScreen(1);
                         view.showClientDetails();
                         break;
+                    /*Redirects to Tab RRE Details */
                     case 2:
                         constants.setMasterScreen(2);
                         view.showRREDetails();
                         break;
+                    /*Redirects to Tab CRRE Details */
                     case 3:
                         constants.setMasterScreen(3);
+                        view.showCRREDetails();
                         break;
                     case 4:
+                        /*Redirects to Tab Master CRRE */
                         constants.setMasterScreen(4);
+                        view.showMRREDetails();
                         break;
                     case 5:
+                        /*Redirects to Tab Master Availability */
                         view.showMasterAvailability();
                         break;
                     case 6:
+                        /*Redirects to Tab Geographic Location */
                         view.showGeoLocation();
                         break;
                     case 7:
-                        view.showRequestedRegion();
+                        /*Redirects to Tab My Active Projects */
+                        view.showAuctionsWon();
                         break;
                     case 8:
+                        //NIL
                         break;
                     default:
-                        throw new IllegalStateException("Unexpected value: " + tab);
+
                 }
-                Toast.makeText(context, tab+"", Toast.LENGTH_SHORT).show();
+
+//                Toast.makeText(context, tab+"", Toast.LENGTH_SHORT).show();
                 break;
 
             default:
-                throw new IllegalStateException("Unexpected value: " + role);
+                //throw new IllegalStateException("Unexpected value: " + role);
         }
+    }
+
+    /*In Low memory device the constant values are cleard when app goes to background, to handle this we have stored the data in cache
+     * and retrieved it, when constants values are  null*/
+    private void resetData() {
+        String userRole = repo.getData(constants.getcacheRoleKey());
+        String tab = repo.getData(constants.getCACHE_SELECTED_TAB());
+        constants.setTAB(Integer.parseInt(tab));
+        if (userRole != null) {
+            switch (userRole) {
+                case "Client":
+                    constants.setuserRole(0);
+                    break;
+                case "RRE":
+                    constants.setuserRole(1);
+                    break;
+                case "CRRE":
+                    constants.setuserRole(2);
+                    break;
+                case "MASTERCRRE":
+                    constants.setuserRole(3);
+                    break;
+            }
+        }
+        init(context);
     }
 
     public void setView(View view) {
@@ -195,10 +255,10 @@ public class HomePresenter implements Utils.UtilAlertInterface, ClientNetworkCal
                 repo.storeData(constants.getcacheIsLoggedKey(), "false");
                 repo.storeData(constants.getCACHE_USER_INFO(), null);
                 networkCall.logout(apiInterface, token, this);
+            } else {
+                utils.showNetworkAlert(context, this);
             }
 
-        } else {
-            view.showErrorMessage(context.getResources().getString(R.string.network_alert));
         }
     }
 
@@ -241,16 +301,52 @@ public class HomePresenter implements Utils.UtilAlertInterface, ClientNetworkCal
 
     public String getProfileImage() {
         String data = repo.getData(constants.getCACHE_USER_INFO());
-        GetUserInfoModel jS = new Gson().fromJson(data, GetUserInfoModel.class);
-        return jS.getData().getUser().getImageUrl();
+        if (data != null) {
+            GetUserInfoModel jS = new Gson().fromJson(data, GetUserInfoModel.class);
+            if (jS == null) {
+                return "";
+            }
+            GetUserInfoModel.Data jsData = jS.getData();
+            if (jsData != null) {
+                GetUserInfoModel.User user = jsData.getUser();
+                if (user != null) {
+                    String url = user.getImageUrl();
+                    if (url != null) {
+                        return url;
+                    }
+
+                }
+            }
+        }
+
+        return "";
     }
 
     public String getUserName() {
         String data = repo.getData(constants.getCACHE_USER_INFO());
         GetUserInfoModel jS = new Gson().fromJson(data, GetUserInfoModel.class);
-
-
-        return jS.getData().getUser().getFirstname() + " " + jS.getData().getUser().getLastName();
+        String fname="";
+        String lname="";
+        if (jS!=null &&jS.getData() != null) {
+            if (jS.getData().getUser() != null) {
+                final String firstname = jS.getData().getUser().getFirstname();
+                if (firstname != null) {
+                    fname = firstname;
+                    final String lastName = jS.getData().getUser().getLastName();
+                    if (lastName != null) {
+                        lname = lastName;
+                    }
+                }
+            }
+        }
+if(!fname.isEmpty()){
+    if(!lname.isEmpty()){
+return fname+" "+lname;
+    }else {
+        return lname;
+    }
+}
+        return "-";
     }
 
     public Bitmap getResizedBitmap(Bitmap image, int maxSize) {
@@ -297,9 +393,12 @@ public class HomePresenter implements Utils.UtilAlertInterface, ClientNetworkCal
 
     @Override
     public void sessionExpired() {
-        repo.storeData(constants.getcacheIsLoggedKey(), "false");
-        repo.storeData(constants.getCACHE_USER_INFO(), null);
-        utils.sessionExpired(context);
+        utils.sessionExpired(context, repo);
+    }
+
+    @Override
+    public void refreshNetwork() {
+        alertResponse("$LOGOUT");
     }
 
 
@@ -338,6 +437,12 @@ public class HomePresenter implements Utils.UtilAlertInterface, ClientNetworkCal
         void showGeoLocation();
 
         void showRequestedRegion();
+
+        void showMRREDetails();
+
+        void showCRREDetails();
+
+        void showAuctionsWon();
     }
 }
 

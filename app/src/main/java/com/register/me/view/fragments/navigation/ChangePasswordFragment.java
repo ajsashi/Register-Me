@@ -13,8 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 
-import com.onurkaganaldemir.ktoastlib.KToast;
 import com.register.me.R;
+import com.register.me.model.data.util.Utils;
 import com.register.me.presenter.ChangePasswordPresenter;
 import com.register.me.view.BaseFragment;
 import com.register.me.view.HomeActivity;
@@ -48,6 +48,8 @@ public class ChangePasswordFragment extends BaseFragment implements IFragment, C
 
     @Inject
     ChangePasswordPresenter presenter;
+    @Inject
+    Utils utils;
 
     public static IFragment newInstance() {
         return new ChangePasswordFragment();
@@ -118,8 +120,7 @@ public class ChangePasswordFragment extends BaseFragment implements IFragment, C
     @Override
     public void showErrorMessage(String message) {
 
-        KToast.customColorToast((Activity) getContext(), message, Gravity.BOTTOM, KToast.LENGTH_SHORT, R.color.red);
-    }
+        utils.showToastMessage(getContext(),message);      }
 
     @Override
     public void popUp() {

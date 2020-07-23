@@ -6,7 +6,7 @@
     android:background="#C3D7D7D7"
     android:visibility="gone"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://scheR.id.pbarmas.android.com/apk/res-auto"
     >
     <me.ibrahimsn.lib.CirclesLoadingView
         android:layout_width="match_parent"

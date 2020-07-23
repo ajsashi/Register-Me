@@ -20,4 +20,9 @@
     <color name="item_background">#198B8989</color>
     <color name="line_color">#2AA34A</color>
     <color name="rating_bar_fill">#EF5A32</color>
+    <color name="red">#FF0000</color>
+    <color name="gray">#808080</color>
+    <color name="green">#008000</color>
+    <color name="blue">#3498DB</color>
+
 </resources>

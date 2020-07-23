@@ -2,19 +2,61 @@ package com.register.me.presenter;
 
 import android.content.Context;
 
+import com.register.me.APIs.MasterNetworkCall;
 import com.register.me.model.data.model.KeyValue;
+import com.register.me.model.data.model.RREApplication;
 import com.register.me.model.data.model.UserInfo;
+import com.register.me.model.data.util.Utils;
 import com.register.me.view.BaseActivity;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class MasterViewDetailPresenter {
+import javax.inject.Inject;
+
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+
+public class MasterViewDetailPresenter implements Utils.UtilNetworkInterface {
 
     private Context context;
+    @Inject
+    MasterNetworkCall masterNetworkCall;
+    @Inject
+    Utils utils;
+    private Observer<String> message;
+    MVDListener listener;
+    private Observer<RREApplication> dcObserver;
+    private String extension;
 
-    public void init(Context context) {
+    public void init(Context context,MVDListener listener) {
         this.context = context;
+        this.listener = listener;
         ((BaseActivity) context).injector().inject(this);
+        message = new Observer<String>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(String s) {
+               if (utils.isOnline(context)) { listener.showMessage(s); }
+               listener.hideProgress();
+               masterNetworkCall.clearDisposable();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        };
+        masterNetworkCall.init(context,message,this);
     }
 
     public ArrayList<KeyValue> getUserDetails(UserInfo userInfo) {
@@ -41,4 +83,63 @@ public class MasterViewDetailPresenter {
 
     }
 
+
+    public void getdocCommentsData(Integer id) {
+        dcObserver=new Observer<RREApplication>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(RREApplication rreApplication) {
+                if (rreApplication.getData()!=null) {
+                    final List<RREApplication.Document> document = rreApplication.getData().getDocument();
+                        listener.updateDocs(document);
+                    List<RREApplication.Comment> comment = rreApplication.getData().getComments();
+                        listener.updateComments(comment);
+                }
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        };
+        masterNetworkCall.getDocCommentDetails(String.valueOf(id),dcObserver);
+    }
+
+    public String getFileName(String doc) {
+        String fileName = doc;
+        int slash = doc.lastIndexOf("/");
+        fileName = fileName.substring(slash+1);
+        int dot = fileName.lastIndexOf(".");
+        extension = fileName.substring(dot);
+        return fileName;
+    }
+
+    public String getExtension() {
+        return extension.replace(".","");
+    }
+    @Override
+    public void refreshNetwork() {
+        listener.onRefresh();
+    }
+
+    public interface MVDListener{
+        void showMessage(String s);
+
+        void onRefresh();
+
+        void updateDocs(List<RREApplication.Document> viewList);
+
+        void updateComments(List<RREApplication.Comment> comment);
+
+        void hideProgress();
+    }
 }
