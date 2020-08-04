@@ -11,13 +11,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -29,6 +33,7 @@ import com.register.me.model.data.model.KeyValue;
 import com.register.me.model.data.model.RREApplication;
 import com.register.me.model.data.model.ViewActCompProject;
 import com.register.me.presenter.HomePresenter;
+import com.register.me.view.activity.WelcomeFragment;
 import com.register.me.view.fragmentmanager.FragmentChannel;
 import com.register.me.view.fragmentmanager.manager.FragmentManagerHandler;
 import com.register.me.view.fragments.CRRE.BankDetailsFragment;
@@ -94,14 +99,19 @@ public class HomeActivity extends BaseActivity implements HomePresenter.View, Fr
     TextView mHeaderText;
     @BindView(R.id.img_back_pressed)
     ImageView mBackPressed;
+    @BindView(R.id.layout_welcome)
+    LinearLayout layout_welcome;
     @BindView(R.id.nav_view)
     NavigationView navigationView;
     @BindView(R.id.img_user_profile)
     ImageView userProfile;
     @BindView(R.id.img_user_notification)
     ImageView notification;
+    @BindView(R.id.relative_header)
+    ConstraintLayout header;
     private CircleImageView profileImage;
     private boolean isProfileClicked = false;
+    private boolean showChangePassword;
 
     @Override
     protected int getLayoutId() {
@@ -117,6 +127,7 @@ public class HomeActivity extends BaseActivity implements HomePresenter.View, Fr
         fragmentManagerHandler.setFragmentContainerId(flContainer);
         homePresenter.setView(this);
         homePresenter.init(this);
+        showWelcomeScreen();
         navigationView.setNavigationItemSelectedListener(this);
         setNavigationHeader();
         updateProfileImage(null);
@@ -129,7 +140,8 @@ public class HomeActivity extends BaseActivity implements HomePresenter.View, Fr
         TextView profileName = (TextView) hView.findViewById(R.id.txt_profile_name);
         String profileImage = homePresenter.getProfileImage();
         if (!profileImage.isEmpty()) {
-            Glide.with(this).load(profileImage).into(this.profileImage);
+            Glide.with(this).load(profileImage).diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .skipMemoryCache(true).into(this.profileImage);
         }
 
         profileName.setText(homePresenter.getUserName());
@@ -147,11 +159,19 @@ public class HomeActivity extends BaseActivity implements HomePresenter.View, Fr
         int id = item.getItemId();
         switch (id) {
             case R.id.nav_home:
-//                showBankDetails();
-                finish();
+                if(fragmentManagerHandler.getStack()>1){
+                popUpAll();
+                showWelcomeScreen(); }
                 break;
             case R.id.nav_change_password:
-                showChangePassword();
+                if(!showChangePassword) {
+                    showChangePassword();
+                }else {
+                    String ctFragment = fragmentManagerHandler.getFragmentName();
+                    if(!ctFragment.equals("ChangePassword")){
+                        fragmentManagerHandler.popUpto("ChangePassword");
+                    }
+                }
                 break;
             case R.id.nav_logout:
                 homePresenter.logout();
@@ -159,6 +179,7 @@ public class HomeActivity extends BaseActivity implements HomePresenter.View, Fr
             default:
                 throw new IllegalStateException("Unexpected value: " + id);
         }
+        isProfileClicked=false;
         mDrawerLayout.closeDrawer(LEFT);
         return true;
     }
@@ -246,15 +267,28 @@ public class HomeActivity extends BaseActivity implements HomePresenter.View, Fr
     }
 
     @Override
-    public void showHome() {
+    public void showWelcomeScreen() {
         fragmentManagerHandler.popUpAll();
+        fragmentManagerHandler.replaceFragment(WelcomeFragment.newInstance(), this);
+    }
+
+    @Override
+    public void showHome() {
         showClientDashBoard();
     }
 
     @Override
     public void setTitle(String title) {
         if (mBackPressed != null) {
-            mBackPressed.setVisibility(View.VISIBLE);
+            if(!title.isEmpty()) {
+                layout_welcome.setVisibility(View.GONE);
+                mBackPressed.setVisibility(View.VISIBLE);
+                header.setBackground(getResources().getDrawable(R.drawable.view_bg_black,null));
+            }else {
+                layout_welcome.setVisibility(View.VISIBLE);
+                mBackPressed.setVisibility(View.GONE);
+                header.setBackgroundColor(getResources().getColor(R.color.transparent));
+            }
             if (mHeaderText != null) {
                 mHeaderText.setText(title.toUpperCase());
             }
@@ -263,6 +297,7 @@ public class HomeActivity extends BaseActivity implements HomePresenter.View, Fr
 
     @Override
     public void showChangePassword() {
+        showChangePassword = true;
         fragmentManagerHandler.replaceFragment(ChangePasswordFragment.newInstance(), this);
     }
 
@@ -284,7 +319,6 @@ public class HomeActivity extends BaseActivity implements HomePresenter.View, Fr
 
     @Override
     public void showClientDashBoard() {
-        fragmentManagerHandler.popUpAll();
         fragmentManagerHandler.replaceFragment(DashBoardFragment.newInstance(), this);
     }
 
@@ -522,12 +556,23 @@ public class HomeActivity extends BaseActivity implements HomePresenter.View, Fr
     }
 
     @Override
+    public void welcomeRedirect() {
+        homePresenter.redirectForWelcomeScreen();
+    }
+
+    @Override
     public void onBackPressed() {
         if (isProfileClicked) {
             isProfileClicked = false;
         }
 
-        if (fragmentManagerHandler.getStack() > 0) {
+        final int stack = fragmentManagerHandler.getStack();
+        String fName=fragmentManagerHandler.getFragmentName();
+        Log.d("fName",fName);
+        if(fName.equals("ChangePassword")){
+            showChangePassword=false;
+        }
+        if (stack > 0) {
             fragmentManagerHandler.onBackPressed();
         } else {
             super.onBackPressed();

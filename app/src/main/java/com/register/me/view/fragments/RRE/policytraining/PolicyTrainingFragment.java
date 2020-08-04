@@ -17,7 +17,6 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.bumptech.glide.Glide;
-import com.google.android.youtube.player.YouTubePlayer;
 import com.google.gson.JsonObject;
 import com.register.me.APIs.RRENetworkCall;
 import com.register.me.R;
@@ -26,8 +25,8 @@ import com.register.me.model.data.model.ResponseData;
 import com.register.me.model.data.util.Utils;
 import com.register.me.presenter.PolicyPresenter;
 import com.register.me.view.BaseFragment;
+import com.register.me.view.HomeActivity;
 import com.register.me.view.activity.VideoActivity;
-import com.register.me.view.activity.WelcomeActivity;
 import com.register.me.view.fragmentmanager.manager.IFragment;
 
 import java.util.ArrayList;
@@ -165,7 +164,7 @@ public class PolicyTrainingFragment extends BaseFragment implements IFragment, P
                 dismissProgress();
                 rreNetworkCall.clearDisposable();
                 Toast.makeText(getContext(), responseData.getData().getMessage(), Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(getContext(), WelcomeActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                startActivity(new Intent(getContext(), HomeActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK));
 
             }
 

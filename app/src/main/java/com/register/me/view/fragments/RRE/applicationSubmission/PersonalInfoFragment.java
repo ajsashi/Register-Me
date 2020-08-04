@@ -2,6 +2,11 @@ package com.register.me.view.fragments.RRE.applicationSubmission;
 
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputFilter;
+import android.text.InputType;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +33,8 @@ import com.register.me.view.BaseFragment;
 import com.register.me.view.fragmentmanager.manager.IFragment;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
@@ -158,6 +165,45 @@ public class PersonalInfoFragment extends BaseFragment implements IFragment, Per
         fragmentChannel.showBankDetails();
     }
 
+    /*
+    * Function that allows only text input for edit text*/
+    public static InputFilter acceptonlyAlphabetValuesnotNumbersMethod() {
+        return new InputFilter() {
+
+            @Override
+            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+
+                boolean isCheck = true;
+                StringBuilder sb = new StringBuilder(end - start);
+                for (int i = start; i < end; i++) {
+                    char c = source.charAt(i);
+                    if (isCharAllowed(c)) {
+                        sb.append(c);
+                    } else {
+                        isCheck = false;
+                    }
+                }
+                if (isCheck)
+                    return null;
+                else {
+                    if (source instanceof Spanned) {
+                        SpannableString spannableString = new SpannableString(sb);
+                        TextUtils.copySpansFrom((Spanned) source, start, sb.length(), null, spannableString, 0);
+                        return spannableString;
+                    } else {
+                        return sb;
+                    }
+                }
+            }
+
+            private boolean isCharAllowed(char c) {
+                Pattern pattern = Pattern.compile("^[a-zA-Z ]+$");
+                Matcher match = pattern.matcher(String.valueOf(c));
+                return match.matches();
+            }
+        };
+    }
+
     private void updateUI(ArrayList<QandA> info) {
 
         View inflateView;
@@ -185,7 +231,7 @@ public class PersonalInfoFragment extends BaseFragment implements IFragment, Per
                     txtAns.setText(answer);
                     txtAns.setHint(question);
                     txtAns.setImeOptions(item.getAction() == 1 ? EditorInfo.IME_ACTION_NEXT : EditorInfo.IME_ACTION_DONE);
-                    if (question.equals("Email") && presenter.getRole() == 2) {
+                    if (question.equals("Email") && (presenter.getRole() == 0||presenter.getRole() == 2)) {
                         changeEmail.setVisibility(View.VISIBLE);
                         changeEmail.setOnClickListener(v -> {
                             presenter.showAlert();
@@ -193,7 +239,9 @@ public class PersonalInfoFragment extends BaseFragment implements IFragment, Per
                     }
                     int inputType = item.getInputType();
                     txtAns.setInputType(presenter.getInputType(inputType));
-
+                    if(inputType==5) {
+                        txtAns.setFilters(new InputFilter[]{acceptonlyAlphabetValuesnotNumbersMethod()});
+                    }
 
                     int finalI = i;
                     if (question.equals("Email")) {
@@ -215,7 +263,7 @@ public class PersonalInfoFragment extends BaseFragment implements IFragment, Per
                                 new Thread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        info.get(finalI).setAnswer(s.toString());
+                                        info.get(finalI).setAnswer(s.toString().trim());
 //                                        Log.d("afterTextChanged", s.toString());
                                     }
                                 }).start();

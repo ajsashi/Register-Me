@@ -6,6 +6,6 @@
         android:topLeftRadius="50dp"
         android:topRightRadius="50dp"/>
 
-    <solid android:color="#3054F2" />
+    <solid android:color="@color/view_bg_blue" />
 
 </shape>

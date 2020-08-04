@@ -68,6 +68,7 @@ public class InitiateRegistrationFragment extends BaseFragment implements IFragm
     Spinner spinnerCrre;
     boolean isMasterAssignment;
     String crreId = "";
+    private boolean isSubmitClicked;
 
 
     @Inject
@@ -110,6 +111,9 @@ public class InitiateRegistrationFragment extends BaseFragment implements IFragm
 
                 if (id != -1) {
                     location_Id = id + "";
+                    /*if (crre.isChecked()) {
+                        crre.setChecked(false);
+                    }*/
                     registrationPresenter.getCrreList(location_Id);
                 } else {
                     location_Id = null;
@@ -147,10 +151,10 @@ public class InitiateRegistrationFragment extends BaseFragment implements IFragm
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 isCRREEnabled = b;
-                if (isCRREEnabled && !isMasterAssignment) {
+                if (crre.isChecked() && !isMasterAssignment&&location_Id!=null) {
                     layoutCrreSelection.setVisibility(View.VISIBLE);
 
-                } else if (isCRREEnabled && isMasterAssignment) {
+                } else if (crre.isChecked()) {
                     layoutCrreSelection.setVisibility(View.GONE);
                 }
             }
@@ -186,18 +190,21 @@ public class InitiateRegistrationFragment extends BaseFragment implements IFragm
 
     @OnClick(R.id.submit)
     public void onSubmitClick() {
-        if (location_Id != null) {
-            ArrayList<KeyValue> list = new ArrayList<>();
-            list.add(new KeyValue("productid", registrationPresenter.getProductID(), null));
+        if(!isSubmitClicked) {
+            if (location_Id != null) {
+                isSubmitClicked= true;
+                ArrayList<KeyValue> list = new ArrayList<>();
+                list.add(new KeyValue("productid", registrationPresenter.getProductID(), null));
 
-            list.add(new KeyValue("locationid", location_Id, null));
-            list.add(new KeyValue("directassignment", String.valueOf(isCRREEnabled), null));
-            list.add(new KeyValue("deadlinedate", txtDate.getText().toString(), null));
-            list.add(new KeyValue("creeid", crreId, null));
+                list.add(new KeyValue("locationid", location_Id, null));
+                list.add(new KeyValue("directassignment", String.valueOf(isCRREEnabled), null));
+                list.add(new KeyValue("deadlinedate", txtDate.getText().toString(), null));
+                list.add(new KeyValue("creeid", crreId, null));
 
-            registrationPresenter.triggerApi(list);
-        }else {
-            showMessage("Please select the country you wish to register");
+                registrationPresenter.triggerApi(list);
+            } else {
+                showMessage("Please select the country you wish to register");
+            }
         }
 
     }
@@ -241,6 +248,7 @@ public class InitiateRegistrationFragment extends BaseFragment implements IFragm
 
     @Override
     public void showMessage(String msg) {
+        isSubmitClicked= false;
         if(msg!=null) {
             utils.showToastMessage(getContext(), msg);
         }
@@ -259,6 +267,7 @@ public class InitiateRegistrationFragment extends BaseFragment implements IFragm
 
     @Override
     public void navigate() {
+        isSubmitClicked= false;
         fragmentChannel.popUp();
     }
 

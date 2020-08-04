@@ -22,7 +22,9 @@ import com.register.me.model.data.model.RREApplication;
 import com.register.me.model.data.util.Utils;
 import com.register.me.presenter.WelcomePresenter;
 import com.register.me.view.BaseActivity;
+import com.register.me.view.BaseFragment;
 import com.register.me.view.HomeActivity;
+import com.register.me.view.fragmentmanager.manager.IFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +36,7 @@ import butterknife.OnClick;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
-public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkInterface, WelcomePresenter.IWelcome {
+public class WelcomeFragment extends BaseFragment implements IFragment, Utils.UtilNetworkInterface, WelcomePresenter.IWelcome {
 
     @BindView(R.id.img_tab_one)
     ImageView tabOne;
@@ -78,7 +80,7 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
             if (s.contains("Failed to connect")) {
                 welcomePresenter.isOnLine();
             } else {
-                Toast.makeText(WelcomeActivity.this, s, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -102,7 +104,6 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
         public void onNext(RREApplication rreApplication) {
             dismissProgress();
             welcomePresenter.setApplicationData(rreApplication);
-            callHome();
 //            Toast.makeText(WelcomeActivity.this, rreApplication.getData().getComments().toString(), Toast.LENGTH_SHORT).show();
             /*questList = addProductPresenter.getRREApplication(rreApplication);
             buildUI();*/
@@ -167,6 +168,10 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
         }
     };
 
+    public static IFragment newInstance() {
+        return new WelcomeFragment();
+    }
+
 
     @Override
     protected int getLayoutId() {
@@ -174,7 +179,7 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         injector().inject(this);
         /*byte[] test ={11,11,11,11,11};
@@ -194,7 +199,7 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
         mRREDash.removeAllViews();
         for (int i = 0; i < title.size(); i++) {
 
-            View inflatedView = LayoutInflater.from(this).inflate(R.layout.rre_welcome_item, mRREDash, false);
+            View inflatedView = LayoutInflater.from(getContext()).inflate(R.layout.rre_welcome_item, mRREDash, false);
 
             ConstraintLayout item = inflatedView.findViewById(R.id.item);
             View topLine = inflatedView.findViewById(R.id.top_line);
@@ -208,15 +213,13 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
 
                     if (title.get(finalI).equals(" Application Submission ")) {
                         triggerAPI();
-                    } else {
-                        callHome();
                     }
                     final int tab = finalI + 1;
                     constants.setTAB(tab);
                     welcomePresenter.setTab(tab);
-
+                    fragmentChannel.welcomeRedirect();
                 } else {
-                    Toast.makeText(this, "Please complete your steps one by one", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Please complete your steps one by one", Toast.LENGTH_SHORT).show();
                 }
             });
             if (i == 0) {
@@ -234,10 +237,6 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
         }
     }
 
-    private void callHome() {
-        startActivity(new Intent(WelcomeActivity.this, HomeActivity.class));
-    }
-
     private void setUpCRREHome() {
         ArrayList<Integer> tile = new ArrayList<>();
         tile.add(R.drawable.my_active_auction);
@@ -249,7 +248,7 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
         tile.add(R.drawable.personal);
         mCRREDash.removeAllViews();
         for (int i = 0; i < tile.size(); i++) {
-            View inflatedView = LayoutInflater.from(this).inflate(R.layout.image_item, mRREDash, false);
+            View inflatedView = LayoutInflater.from(getContext()).inflate(R.layout.image_item, mRREDash, false);
             ImageView tileImg = inflatedView.findViewById(R.id.tile);
             tileImg.setImageResource(tile.get(i));
             int finalI = i;
@@ -257,24 +256,24 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
                 final int tab = finalI + 1;
                 constants.setTAB(tab);
                 welcomePresenter.setTab(tab);
-                callHome();
+                fragmentChannel.welcomeRedirect();
             });
             mCRREDash.addView(inflatedView);
         }
     }
 
     private void setUpMasterCRREHome(List<MasterDash.Dashboard> list) {
-        ArrayList<String> mcList = new ArrayList<>();
+        /*ArrayList<String> mcList = new ArrayList<>();
         mcList.add("Client Details");
         mcList.add("RRE Details");
         mcList.add("Cerified RRE Details");
         mcList.add("Master RRE Details");
         mcList.add("Master Availability");
         mcList.add("Geographics Locations");
-        mcList.add("My Active Projects");
+        mcList.add("My Active Projects");*/
         mCRREDash.removeAllViews();
         for (int i = 0; i < list.size(); i++) {
-            View inflatedView = LayoutInflater.from(this).inflate(R.layout.master_crre_item, mRREDash, false);
+            View inflatedView = LayoutInflater.from(getContext()).inflate(R.layout.master_crre_item, mRREDash, false);
             TextView textView = inflatedView.findViewById(R.id.txtTitle);
             textView.setText(list.get(i).getName());
             int finalI = i;
@@ -282,7 +281,7 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
                 final int tab = finalI + 1;
                 constants.setTAB(tab);
                 welcomePresenter.setTab(tab);
-                callHome();
+                fragmentChannel.welcomeRedirect();
             });
             mCRREDash.addView(inflatedView);
         }
@@ -297,7 +296,7 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
     public void onTabOneClick() {
         constants.setTAB(1);
         welcomePresenter.setTab(1);
-        callHome();
+        fragmentChannel.showAddProduct();
 
     }
 
@@ -318,7 +317,7 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
         constants.setTAB(4);
         welcomePresenter.setTab(4);
         if (constants.getuserRole() == 0) {
-            callHome();
+            fragmentChannel.welcomeRedirect();
         }
     }
 
@@ -333,7 +332,8 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
     public void onResume() {
         super.onResume();
         try {
-            welcomePresenter.init(this, this);
+            fragmentChannel.setTitle("");
+            welcomePresenter.init(getContext(), this);
             welcomePresenter.getUserProfile();
             userRole = constants.getuserRole();
             if (userRole != -1) {
@@ -347,6 +347,7 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
 
     @Override
     public void buildUI() {
+        fragmentChannel.updateNavigation();
         checkRole();
     }
 
@@ -356,7 +357,7 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
                 clientDash.setVisibility(View.VISIBLE);
                 break;
             case 1:
-                rreNetworkCall.init(this, message, this);
+                rreNetworkCall.init(getContext(), message, this);
                 showProgress();
                 rreNetworkCall.getStepStatus(getStepObserver);
                 break;
@@ -366,7 +367,7 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
                 break;
             case 3:
                 dashCRRE.setVisibility(View.VISIBLE);
-                masterNetworkCall.init(this, message, this);
+                masterNetworkCall.init(getContext(), message, this);
                 showProgress();
                 masterNetworkCall.getDashBoardData(dashObserver);
                 break;
@@ -385,4 +386,8 @@ public class WelcomeActivity extends BaseActivity implements Utils.UtilNetworkIn
         progressLayout.setVisibility(View.GONE);
     }
 
+    @Override
+    public String getFragmentName() {
+        return "WelcomeActivity";
+    }
 }

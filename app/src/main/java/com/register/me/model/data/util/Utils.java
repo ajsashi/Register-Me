@@ -784,7 +784,8 @@ public class Utils {
     }
 
     public void showToastMessage(Context context, String message) {
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+        if(context!=null){
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();}
     }
     public void showKeyboard(Context context) {
         InputMethodManager imm = (InputMethodManager)

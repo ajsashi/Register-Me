@@ -86,7 +86,7 @@ public class CRREListFragment extends BaseFragment implements IFragment, CRREDet
     @Override
     public void onResume() {
         super.onResume();
-        fragmentChannel.setTitle("CRRE Dashboard");
+        fragmentChannel.setTitle("CRRE Details");
 
     }
 

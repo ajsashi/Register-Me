@@ -16,6 +16,7 @@ import com.register.me.model.data.Constants;
 import com.register.me.model.data.repository.CacheRepo;
 import com.register.me.presenter.LoginPresenter;
 import com.register.me.view.BaseActivity;
+import com.register.me.view.HomeActivity;
 
 import javax.inject.Inject;
 
@@ -119,7 +120,7 @@ public class LoginActivity extends BaseActivity implements LoginPresenter.ILogin
     @Override
     public void navigate() {
 
-            startActivity(new Intent(this, WelcomeActivity.class));
+            startActivity(new Intent(this, HomeActivity.class));
             finish();
     }
 

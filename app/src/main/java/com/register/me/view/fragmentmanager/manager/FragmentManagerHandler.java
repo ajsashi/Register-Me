@@ -92,6 +92,10 @@ public class FragmentManagerHandler {
         fragmentTagStack.popUpAll();
     }
 
+    public void popUpto(String tagName){
+        fragmentManager.popBackStack(tagName, 0);
+    }
+
     /**
      * Returns currently displayed fragment on screen, having in mind that fragment could be popped
      * up just a moment ago.

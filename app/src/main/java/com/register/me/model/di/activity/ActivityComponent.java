@@ -36,7 +36,7 @@ import com.register.me.presenter.WelcomePresenter;
 import com.register.me.view.HomeActivity;
 import com.register.me.view.activity.LoginActivity;
 import com.register.me.view.activity.SignUpActivity;
-import com.register.me.view.activity.WelcomeActivity;
+import com.register.me.view.activity.WelcomeFragment;
 import com.register.me.view.fragments.CRRE.BankDetailsFragment;
 import com.register.me.view.fragments.CRRE.MyActiveAuctionsFragment;
 import com.register.me.view.fragments.CRRE.MySuccessStory;
@@ -90,7 +90,7 @@ public interface ActivityComponent {
 
     void inject(DashBoardFragment dashBoardFragment);
 
-    void inject(WelcomeActivity welcomeActivity);
+    void inject(WelcomeFragment welcomeActivity);
 
     void inject(PortFolioFragment portfolioFragment);
 

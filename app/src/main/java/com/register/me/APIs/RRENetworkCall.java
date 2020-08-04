@@ -113,6 +113,11 @@ public class RRENetworkCall {
                             Observable<RREApplication> obs = Observable.just(response.body());
                             obs.subscribe(getApplicationObserver);
                             break;
+                        case 400:
+                            Error error_Data = new Gson().fromJson(response.errorBody().charStream(), Error.class);
+                            String msg = error_Data.getMessage();
+                            errorMessage(msg);
+                            break;
                         case 401:
                             Error errorData = new Gson().fromJson(response.errorBody().charStream(), Error.class);
                             String message = errorData.getMessage();
@@ -219,6 +224,11 @@ public class RRENetworkCall {
                     assert response.body() != null;
                     Observable<RREComments> obs = Observable.just(response.body());
                     obs.subscribe(commentsObserver);
+                    break;
+                case 400:
+                    Error error_Data = new Gson().fromJson(response.errorBody().charStream(), Error.class);
+                    String msg = error_Data.getData().getMessage();
+                    errorMessage(msg);
                     break;
                 case 401:
                     Error errorData = new Gson().fromJson(response.errorBody().charStream(), Error.class);

@@ -3,6 +3,7 @@ package com.register.me.view.fragments.CRRE;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -39,6 +40,9 @@ public class MyActiveAuctionsFragment extends BaseFragment implements IFragment,
     ConstraintLayout progressBar;
     @BindView(R.id.no_content_layout)
     LinearLayout no_content_layout;
+
+    @BindView(R.id.sub_header)
+    TextView subHeader;
     @Inject
     Utils utils;
 
@@ -186,9 +190,11 @@ public class MyActiveAuctionsFragment extends BaseFragment implements IFragment,
         super.onResume();
         crreNetworkCall.init(getContext(), message, this);
         if (activeAuction) {
+            subHeader.setText("Active Auctions");
             fragmentChannel.setTitle("Active Auctions");
             crreNetworkCall.getMyActiveAucitons(auctionObservable);
         } else {
+            subHeader.setText("Auctions InProgress");
             fragmentChannel.setTitle("Auctions InProgress");
             crreNetworkCall.getMyAuctionInProgress(inprogressObservable);
         }

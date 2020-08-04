@@ -46,10 +46,10 @@ public class WelcomePresenter implements ClientNetworkCall.NetworkCallInterface,
     }
 
     public synchronized void getUserProfile() {
-        String data = repo.getData(constants.getCACHE_USER_INFO());
-        if (data == null) {
+       /* String data = repo.getData(constants.getCACHE_USER_INFO());
+        if (data == null) {*/
             apiUserProfileCall();
-        }
+        /*}*/
     }
 
     private void apiUserProfileCall() {
@@ -67,6 +67,10 @@ public class WelcomePresenter implements ClientNetworkCall.NetworkCallInterface,
         if (response instanceof GetUserInfoModel) {
             GetUserInfoModel body = ((GetUserInfoModel) response);
             repo.storeData(constants.getCACHE_USER_INFO(), new Gson().toJson(body));
+            GetUserInfoModel.User modle = ((GetUserInfoModel) response).getData().getUser();
+            String name = modle.getFirstname() + " " + modle.getLastName();
+            repo.storeData(constants.getcacheUsernameKey(), name.trim());
+            repo.storeData(constants.getcacheUserProfileUrlKey(), modle.getImageUrl());
             listener.buildUI();
         }
     }

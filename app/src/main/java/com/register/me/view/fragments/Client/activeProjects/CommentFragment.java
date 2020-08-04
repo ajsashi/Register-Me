@@ -97,11 +97,8 @@ public class CommentFragment extends BaseFragment implements IFragment, CommentP
             buildMCRREUI();
         } else {
             final int role = presenter.getRole();
-            if (role == 0| role ==1) {
+            if (role == 0|| role ==1||role==2)
                 basicSetUp();
-            } else {
-                // noContentLayout.setVisibility(View.VISIBLE);
-            }
         }
     }
 
@@ -221,6 +218,7 @@ public class CommentFragment extends BaseFragment implements IFragment, CommentP
 
     private void buildUI() {
         if (mComment.size() != 0) {
+            noContentLayout.setVisibility(View.GONE);
             commentContainer.removeAllViews();
             for (ViewActCompProject.Comment commentItem : mComment) {
                 View inflater = presenter.setUpDescription(commentItem);

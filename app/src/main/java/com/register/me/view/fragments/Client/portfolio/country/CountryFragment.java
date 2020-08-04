@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.register.me.R;
@@ -26,6 +27,9 @@ import com.register.me.view.fragmentmanager.manager.IFragment;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -77,10 +81,14 @@ public class CountryFragment extends BaseFragment implements IFragment, CountryP
 
     @NotNull
     private View getView(ProjectModel.Project cList) {
+        if(getContext()==null){
+            return null ;
+        }
         View inflatedView = LayoutInflater.from(getContext()).inflate(R.layout.country_item, null, false);
         TextView country = inflatedView.findViewById(R.id.txt_pCountry);
         TextView startDate = inflatedView.findViewById(R.id.txt_startDate);
         TextView status = inflatedView.findViewById(R.id.txt_status);
+        CardView card_status = inflatedView.findViewById(R.id.card_status);
         ImageView viewIcon = inflatedView.findViewById(R.id.view);
         ImageView directAssignIcon = inflatedView.findViewById(R.id.direct_assign);
         ImageView cancelIcon = inflatedView.findViewById(R.id.close);
@@ -88,9 +96,33 @@ public class CountryFragment extends BaseFragment implements IFragment, CountryP
         String region = cList.getProjectlocations().getRegion();
         country.setText(region);
         String bidStartDate = cList.getProductOppurtunity().getBidStartDate();
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        try {
+            Date date = new Date();
+            String dateTime = dateFormat.format(date);
+            System.out.println("Current Date Time : " + dateTime);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         startDate.setText(bidStartDate);
         String bidstatus = cList.getBidstatus();
         status.setText(bidstatus);
+        final String s = bidstatus.toLowerCase();
+        if(s.contains("cancel")){
+            card_status.setCardBackgroundColor(getContext().getResources().getColor(R.color.red));
+            status.setTextColor(getContext().getResources().getColor(R.color.white));
+        }else if(s.contains("open")){
+            card_status.setCardBackgroundColor(getContext().getResources().getColor(R.color.yellow));
+            status.setTextColor(getContext().getResources().getColor(R.color.black));
+        }else if(s.contains("assignment")){
+            card_status.setCardBackgroundColor(getContext().getResources().getColor(R.color.blue));
+            status.setTextColor(getContext().getResources().getColor(R.color.white));
+        }else if(s.contains("response")){
+            card_status.setCardBackgroundColor(getContext().getResources().getColor(R.color.yellow));
+            status.setTextColor(getContext().getResources().getColor(R.color.black));
+        }
         if(bidstatus.equals("Waiting for Assignment")){
             status.setOnClickListener(view -> {
                 fragmentChannel.showProjectAssign(presenter.getName(),cList.getProjectlocations().getLocationid(),cList.getProjectlocations().getRegion());
@@ -152,7 +184,11 @@ public class CountryFragment extends BaseFragment implements IFragment, CountryP
         container.removeAllViews();
         for (int i = 0; i < projects.size(); i++) {
             View inflatedView = getView(projects.get(i));
-            container.addView(inflatedView);
+            if(inflatedView!=null) {
+                container.addView(inflatedView);
+            }else {
+                return;
+            }
         }
     }
 

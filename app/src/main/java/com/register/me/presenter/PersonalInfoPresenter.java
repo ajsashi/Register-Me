@@ -87,36 +87,50 @@ public class PersonalInfoPresenter implements ClientNetworkCall.NetworkCallInter
         }
     }
 
+    ArrayList<String> list = new ArrayList<>();
+
+
     public void validate(ArrayList<QandA> info) {
         boolean isTelephone = false;
         boolean isCellphone = false;
-
+        list.add("Telephone");
+        list.add("cell phone");
+        list.add("company name");
+        list.add("division");
+        list.add("address 1");
+        list.add("address 2");
+        list.add("city");
+        list.add("state");
+        list.add("postal code");
+        list.add("country");
         for (QandA item : info) {
             final String quest = item.getQuestion().toLowerCase();
             if (item.getAnswer() == null || item.getAnswer().isEmpty()) {
-                if(!quest.equals("telephone")&&!quest.equals("cell phone")){
+                if (getRole() != 1 && !quest.equals("telephone") && !quest.equals("cell phone")) {
                     listener.showErrorMessage("Please enter " + item.getQuestion());
                     return;
+                } else {
+                    if (!list.contains(quest)) {
+                        listener.showErrorMessage("Please enter " + item.getQuestion());
+                        return;
+                    }
                 }
 
-            }
-            else if (item.getQuestion().equals("Notification") && getRole() == 0 && item.getAnswer().equals("false")) {
+            } else if (item.getQuestion().equals("Notification") && getRole() == 0 && item.getAnswer().equals("false")) {
                 listener.showErrorMessage("Please enable " + item.getQuestion());
                 return;
-            }else {
-                if(quest.equals("telephone")){
-                    isTelephone=true;
-                    break;
-                }else if(quest.equals("cell phone")){
-                    isCellphone=true;
-                    break;
+            } else {
+                if (quest.equals("telephone")) {
+                    isTelephone = true;
+                } else if (quest.equals("cell phone")) {
+                    isCellphone = true;
                 }
             }
 
         }
-        if(isTelephone||isCellphone){
+        if (isTelephone || isCellphone) {
             updateUser(info);
-        }else {
+        } else {
             listener.showErrorMessage("Either telephone or cell phone is mandatory");
 
         }
@@ -176,8 +190,8 @@ public class PersonalInfoPresenter implements ClientNetworkCall.NetworkCallInter
     public void alertResponse(String success) {
         if (getRole() == 0) {
             listener.exitScreen();
-        }else if(success.contains("$EMAIL")){
-            Toast.makeText(context, success.replace("$EMAIL:",""), Toast.LENGTH_SHORT).show();
+        } else if (success.contains("$EMAIL")) {
+            Toast.makeText(context, success.replace("$EMAIL:", ""), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -197,12 +211,17 @@ public class PersonalInfoPresenter implements ClientNetworkCall.NetworkCallInter
             ArrayList<QandA> countryInfo = new ArrayList<QandA>();
             ArrayList<QandA> notificaionInfo = new ArrayList<QandA>();
             repo.storeData(constants.getCACHE_USER_INFO(), new Gson().toJson(body));
+            GetUserInfoModel.User modle = ((GetUserInfoModel) response).getData().getUser();
+            String name = modle.getFirstname() + " " + modle.getLastName();
+            repo.storeData(constants.getcacheUsernameKey(), name.trim());
+            repo.storeData(constants.getcacheUserProfileUrlKey(), modle.getImageUrl());
 
             /*
-             * 1 - text
+             * 1 - text n Number
              * 2 - email
              * 3 - password
              * 4 - number
+             * 5 - only text
              * */
             /*
              * 1 - action_next;
@@ -220,10 +239,10 @@ public class PersonalInfoPresenter implements ClientNetworkCall.NetworkCallInter
             countryInfo.add(new QandA("Division", user.getOrganization() == null ? "" : user.getOrganization().getDivision(), 1, 1, 1, "division", null, null));
             countryInfo.add(new QandA("Address 1", user.getOrganization() == null ? "" : user.getOrganization().getAddress(), 1, 1, 1, "address1", null, null));
             countryInfo.add(new QandA("Address 2", user.getOrganization() == null ? "" : user.getOrganization().getAddress2(), 1, 1, 1, "address2", null, null));
-            countryInfo.add(new QandA("City", user.getOrganization() == null ? "" : user.getOrganization().getCity(), 1, 1, 1, "city", null, null));
-            countryInfo.add(new QandA("State", user.getOrganization() == null ? "" : user.getOrganization().getState(), 1, 1, 1, "state", null, null));
+            countryInfo.add(new QandA("City", user.getOrganization() == null ? "" : user.getOrganization().getCity(), 1, 5, 1, "city", null, null));
+            countryInfo.add(new QandA("State", user.getOrganization() == null ? "" : user.getOrganization().getState(), 1, 5, 1, "state", null, null));
             countryInfo.add(new QandA("Postal Code", user.getOrganization() == null ? "" : user.getOrganization().getPostalCode(), 1, 1, 1, "postalcode", null, null));
-            countryInfo.add(new QandA("Country", user.getOrganization() == null ? "" : user.getOrganization().getCountry(), 1, 1, 1, "country", null, null));
+            countryInfo.add(new QandA("Country", user.getOrganization() == null ? "" : user.getOrganization().getCountry(), 1, 5, 1, "country", null, null));
 
             if (user.getEmailNotification() != null) {
                 isEmail = user.getEmailNotification();
@@ -263,7 +282,7 @@ public class PersonalInfoPresenter implements ClientNetworkCall.NetworkCallInter
     }
 
     public void showAlert() {
-        utils.showAlert(context,25,this);
+        utils.showAlert(context, 25, this);
     }
 
 

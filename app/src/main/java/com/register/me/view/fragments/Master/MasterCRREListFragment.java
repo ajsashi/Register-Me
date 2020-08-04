@@ -88,7 +88,7 @@ public class MasterCRREListFragment extends BaseFragment implements IFragment, M
     @Override
     public void onResume() {
         super.onResume();
-        fragmentChannel.setTitle("Master CRRE Dashboard");
+        fragmentChannel.setTitle("Master CRRE Details");
 
     }
 

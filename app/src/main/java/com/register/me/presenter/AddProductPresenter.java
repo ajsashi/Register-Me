@@ -200,6 +200,9 @@ public class AddProductPresenter implements ClientNetworkCall.NetworkCallInterfa
         int i = 0;
         boolean isEqual = false;
         for (String string : array) {
+            if(string.contains("Transitional Adolescent")){
+                string = string.replace(",",";");
+            }
             for (String sub : subList) {
                 if (string.equals(sub.trim())) {
                     isEqual = true;
@@ -217,7 +220,7 @@ public class AddProductPresenter implements ClientNetworkCall.NetworkCallInterfa
     public void validateAnswers(List<QandA> questList) {
         for (QandA item : questList) {
             String ans = item.getAnswer();
-            if (ans == null) {
+            if (ans == null||ans.isEmpty()) {
                 listener.showErrorMessage(item.getApiKey().toUpperCase() + " is missing");
                 return;
             } else if (ans.equals("true") && item.getSubQA() != null && item.getSubQA().getAnswer() == null) {

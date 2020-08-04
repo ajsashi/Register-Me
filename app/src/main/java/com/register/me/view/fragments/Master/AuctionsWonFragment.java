@@ -81,14 +81,14 @@ public class AuctionsWonFragment extends BaseFragment implements IFragment, Auct
     @Override
     public void onResume() {
         super.onResume();
-        fragmentChannel.setTitle("Auction List");
+        fragmentChannel.setTitle("My Active Projects");
         showProgress();
         presenter.getAuctionsList();
     }
 
     @Override
     public String getFragmentName() {
-        return "RequestedRegionFragment";
+        return "AuctionsWonFragment";
     }
 
     public void showProgress() {

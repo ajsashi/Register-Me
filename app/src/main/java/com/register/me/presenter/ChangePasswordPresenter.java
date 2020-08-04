@@ -49,24 +49,32 @@ public class ChangePasswordPresenter implements ClientNetworkCall.NetworkCallInt
     }
 
 
-    public void validate(String ctPass, String newPass, String conPass) {
+    public String validate(String ctPass, String newPass, String conPass) {
         Pattern pattern = Pattern.compile(
                 constants.getPasswordPattern());
 
         if (!ctPass.isEmpty() && !newPass.isEmpty() && !conPass.isEmpty()) {
             Matcher newMatcher = pattern.matcher(newPass);
             if (ctPass.equals(newPass)) {
-                listener.showErrorMessage(context.getResources().getString(R.string.same_password_alert));
+//                listener.showErrorMessage(context.getResources().getString(R.string.same_password_alert));
+                return context.getResources().getString(R.string.same_password_alert);
+            }
+            else if(!newPass.equals(conPass)){
+                return "Password Mismatch";
             }
             else if(!newMatcher.matches())
             {
-                listener.showErrorMessage(context.getResources().getString(R.string.password_alert));
+//                listener.showErrorMessage(context.getResources().getString(R.string.password_alert));
+                return context.getResources().getString(R.string.password_alert);
             } else {
                 apicall(ctPass, newPass);
             }
         } else {
-            listener.showErrorMessage("All fields are mandatory");
+
+//            listener.showErrorMessage("All fields are mandatory");
+            return "All fields are mandatory";
         }
+        return "";
     }
 
     private void apicall(String ctPass, String newPass) {
@@ -120,9 +128,13 @@ public class ChangePasswordPresenter implements ClientNetworkCall.NetworkCallInt
     }
 
 
-    public interface IChangePassword {
+    public interface IChangePassword{
         void showErrorMessage(String message);
 
         void popUp();
+        void showProgress();
+        void hideProgress();
+
+
     }
 }

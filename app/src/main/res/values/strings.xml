@@ -129,7 +129,7 @@
         <item>Cloud</item>
         <item>Network</item>
         <item>Wireless</item>
-        <item>Removable media</item>
+        <item>Removable Media</item>
     </string-array>
     <string-array name="product_type">
         <item>Reusable Single-Use Product</item>
@@ -172,9 +172,9 @@
     <string name="are_there_any_direct_or_indirect_patient_contacting_components">Are there any direct or indirect patient contacting components?</string>
     <string name="is_the_device_digital_health_technology_or_does_it_contain_digital_health_technology">Is the device digital health technology, or does it contain digital health technology?</string>
     <string name="does_the_device_use_software_firmware">Does the device use software/firmware?</string>
-    <string name="select_the_type_of_sterile_processing">Select the type of sterile processing</string>
+    <string name="select_the_type_of_sterile_processing">the type of sterile processing</string>
     <string name="does_the_device_or_a_component_need_sterilization_by_the_manufacturer_or_user">Does the device or a component need sterilization (by the manufacturer or user) ?</string>
-    <string name="select_electrical_device_type">Select Electrical Device Type</string>
+    <string name="select_electrical_device_type">Electrical Device Type</string>
     <string name="avatar_update_failed">Profile Image update Failed</string>
     <string name="update_product">Update Product</string>
     <string name="direct_master_crre_assignment">Do you want to assign the product directly to Master CRRE?</string>

@@ -28,7 +28,7 @@ public class DashBoardFragment extends BaseFragment implements IFragment, DashBo
         super.onCreate(savedInstanceState);
         injector().inject(this);
         dashBoardPresenter.setView(this);
-        fragmentChannel.setTitle(getResources().getString(R.string.client_dashboard));
+
     }
 
     @Override
@@ -38,6 +38,11 @@ public class DashBoardFragment extends BaseFragment implements IFragment, DashBo
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        fragmentChannel.setTitle(getResources().getString(R.string.client_dashboard));
+    }
 
     @Override
     public void dispose() {

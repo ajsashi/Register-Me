@@ -191,8 +191,8 @@ public class MySuccessStory extends BaseFragment implements IFragment, Utils.Uti
             sub_header.setText("My Certificate");
             fragmentChannel.setTitle("My Certificate");
         }else if(constants.isLibrary()) {
-            sub_header.setText("My Library");
-            fragmentChannel.setTitle("My Library");
+            sub_header.setText("Personal Library");
+            fragmentChannel.setTitle("Personal Library");
         }
     }
 

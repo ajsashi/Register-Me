@@ -197,8 +197,8 @@ public class ViewProductPresenter implements ClientNetworkCall.NetworkCallInterf
     }
 
     public String getBoolValue(KeyValue val) {
-        String mYES = "YES";
-        String mNO = "NO";
+        String mYES = "Yes";
+        String mNO = "No";
         switch (val.getValue()) {
             case "null":
                 return "-";
@@ -337,7 +337,7 @@ public class ViewProductPresenter implements ClientNetworkCall.NetworkCallInterf
         TextView status = inflater.findViewById(R.id.txt_status_val);
         regExpert.setText(crreItem.getCrreName());
         sudDate.setText(crreItem.getSubmittedDate());
-        compDate.setText(getCompletionDate().split(" ")[0]);
+        compDate.setText(crreItem.getCompletionDate());
         amount.setText(String.valueOf(crreItem.getAmount()));
         remark.setText(crreItem.getRemarks() == null ? " - " : crreItem.getRemarks());
         status.setText(crreItem.getBiddingStatus());

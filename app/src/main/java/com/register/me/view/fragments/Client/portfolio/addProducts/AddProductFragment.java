@@ -69,6 +69,8 @@ public class AddProductFragment extends BaseFragment implements IFragment, AddPr
     TextView subHeader;
     @BindView(R.id.card_add)
     CardView add;
+    @BindView(R.id.card_clear)
+    CardView clear;
     @BindView(R.id.product_container)
     LinearLayout container;
     private String mTrue = "true";
@@ -197,7 +199,6 @@ public class AddProductFragment extends BaseFragment implements IFragment, AddPr
         int finalI14 = i;
         String question = item.getQuestion();
         List<String> sublist = item.getSubQA().getSubList();
-
         if (item.getAnswer() != null && item.getAnswer().equals(mTrue)) {
             rrYes.setChecked(true);
             subRS.setVisibility(View.VISIBLE);
@@ -215,7 +216,7 @@ public class AddProductFragment extends BaseFragment implements IFragment, AddPr
             if (sublist != null) {
                 updateSpinner(item, selectTxtRS, spinner, sublist, array);
             } else {
-                selectTxtRS.setText(item.getSubQA().getQuestion());
+                selectTxtRS.setText(String.format("%s%s", mSelect, item.getSubQA().getQuestion()));
             }
         } else {
             array = context.getResources().getStringArray(R.array.battery);
@@ -231,7 +232,7 @@ public class AddProductFragment extends BaseFragment implements IFragment, AddPr
                 int id = radioGroup.getCheckedRadioButtonId();
                 if (id == R.id.rdValue_yes) {
                     subRS.setVisibility(View.VISIBLE);
-                    selectTxtRS.setText(item.getSubQA().getQuestion());
+                    selectTxtRS.setText(String.format("%s%s", mSelect, item.getSubQA().getQuestion()));
                     questList.get(finalI14).setAnswer(mTrue);
                 } else {
                     subRS.setVisibility(View.GONE);
@@ -493,7 +494,7 @@ public class AddProductFragment extends BaseFragment implements IFragment, AddPr
 
             @Override
             public void afterTextChanged(Editable editable) {
-                questList.get(finalI1).setAnswer(editable.toString());
+                questList.get(finalI1).setAnswer(editable.toString().trim());
             }
         });
 
@@ -546,6 +547,10 @@ public class AddProductFragment extends BaseFragment implements IFragment, AddPr
         addProductPresenter.validateAnswers(questList);
     }
 
+    @OnClick(R.id.card_clear)
+    public void onClearClick(){
+        onResume();
+    }
 
     @OnClick(R.id.card_cancel)
     public void onClickCancel() {
@@ -616,6 +621,7 @@ dismissProgress();
 //            rreNetworkCall.viewRREApplication(applicationObserver);
             questList = addProductPresenter.getRREApplication();
             addEditBtn.setText("SUBMIT");
+            clear.setVisibility(View.VISIBLE);
             if (questList != null) {
                 buildUI();
             }

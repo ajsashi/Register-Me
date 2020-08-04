@@ -18,6 +18,8 @@ public interface FragmentChannel {
 
     void updateNavigation();
 
+    void showWelcomeScreen();
+
     void showHome();
 
     void setTitle(String title);
@@ -79,4 +81,6 @@ public interface FragmentChannel {
     void showPaymnetScreen(String nextdueamount, ShippingInformation shippingInfo);
 
     void showBankDetails();
+
+    void welcomeRedirect();
 }

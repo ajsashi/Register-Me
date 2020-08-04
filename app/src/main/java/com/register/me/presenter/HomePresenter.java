@@ -61,6 +61,10 @@ public class HomePresenter implements Utils.UtilAlertInterface, ClientNetworkCal
         this.context = context;
         ((BaseActivity) context).injector().inject(this);
         apiInterface = retrofit.create(ApiInterface.class);
+        //redirectForWelcomeScreen();
+    }
+
+    public void redirectForWelcomeScreen() {
         int role = constants.getuserRole();
         int tab = constants.getTAB();
 
@@ -300,8 +304,8 @@ public class HomePresenter implements Utils.UtilAlertInterface, ClientNetworkCal
 
 
     public String getProfileImage() {
-        String data = repo.getData(constants.getCACHE_USER_INFO());
-        if (data != null) {
+        String data = repo.getData(constants.getcacheUserProfileUrlKey());
+        if (data != null) {return data;}/*{
             GetUserInfoModel jS = new Gson().fromJson(data, GetUserInfoModel.class);
             if (jS == null) {
                 return "";
@@ -317,17 +321,20 @@ public class HomePresenter implements Utils.UtilAlertInterface, ClientNetworkCal
 
                 }
             }
-        }
+        }*/
 
         return "";
     }
 
     public String getUserName() {
-        String data = repo.getData(constants.getCACHE_USER_INFO());
-        GetUserInfoModel jS = new Gson().fromJson(data, GetUserInfoModel.class);
-        String fname="";
-        String lname="";
-        if (jS!=null &&jS.getData() != null) {
+        String data = repo.getData(constants.getcacheUsernameKey());
+        if(data!=null){
+            return data;
+        }
+       /* GetUserInfoModel jS = new Gson().fromJson(data, GetUserInfoModel.class);
+        String fname = "";
+        String lname = "";
+        if (jS != null && jS.getData() != null) {
             if (jS.getData().getUser() != null) {
                 final String firstname = jS.getData().getUser().getFirstname();
                 if (firstname != null) {
@@ -339,13 +346,13 @@ public class HomePresenter implements Utils.UtilAlertInterface, ClientNetworkCal
                 }
             }
         }
-if(!fname.isEmpty()){
-    if(!lname.isEmpty()){
-return fname+" "+lname;
-    }else {
-        return lname;
-    }
-}
+        if (!fname.isEmpty()) {
+            if (!lname.isEmpty()) {
+                return fname + " " + lname;
+            } else {
+                return fname;
+            }
+        }*/
         return "-";
     }
 

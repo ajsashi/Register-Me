@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginStart="15dp"
@@ -55,7 +56,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
-            android:text="Client Personal Information"
+            android:text="Personal Information"
             android:textColor="#00acd3"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -248,18 +249,21 @@
             app:srcCompat="@drawable/ic_keyboard_arrow_down_black_24dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:overScrollMode="never"
+    android:scrollbars="none"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/layout_certificate_process">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/certificate_data"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="#EAEAD3"
+        android:layout_height="match_parent"
         android:overScrollMode="never"
-        android:scrollbars="none"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layout_certificate_process">
-
+        android:visibility="visible"
+       >
 
         <TextView
             android:id="@+id/textView26"
@@ -275,8 +279,8 @@
             android:id="@+id/textView27"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
             android:text="Online Interview"
+            android:layout_marginTop="30dp"
             app:layout_constraintStart_toStartOf="@+id/textView26"
             app:layout_constraintTop_toBottomOf="@+id/textView26" />
 
@@ -284,7 +288,7 @@
             android:id="@+id/textView28"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="30dp"
             android:text="Application &amp; Policy Training"
             app:layout_constraintStart_toStartOf="@+id/textView27"
             app:layout_constraintTop_toBottomOf="@+id/textView27" />
@@ -293,8 +297,8 @@
             android:id="@+id/textView29"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
             android:text="Certificate"
+            android:layout_marginTop="30dp"
             app:layout_constraintStart_toStartOf="@+id/textView28"
             app:layout_constraintTop_toBottomOf="@+id/textView28" />
 
@@ -397,8 +401,54 @@
                 android:textColor="@color/white" />
         </androidx.cardview.widget.CardView>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/txt_app_sub_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="TextView"
+            android:textSize="11sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@+id/apl_stat_lay"
+            app:layout_constraintTop_toBottomOf="@+id/apl_stat_lay" />
 
+
+        <TextView
+            android:id="@+id/txt_inter_sub_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="TextView"
+            android:textSize="11sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@+id/interview_stat_lay"
+            app:layout_constraintTop_toBottomOf="@+id/interview_stat_lay" />
+
+        <TextView
+            android:id="@+id/txt_polic_sub_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="TextView"
+            android:textSize="11sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@+id/policy_stat_lay"
+            app:layout_constraintTop_toBottomOf="@+id/policy_stat_lay" />
+
+        <TextView
+            android:id="@+id/txt_cert_sub_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="TextView"
+            android:textSize="11sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@+id/certificate_stat_lay"
+            app:layout_constraintTop_toBottomOf="@+id/certificate_stat_lay" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/progressBar"
         android:layout_width="match_parent"

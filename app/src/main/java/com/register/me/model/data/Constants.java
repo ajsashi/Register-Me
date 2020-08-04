@@ -167,7 +167,6 @@ public class Constants {
         return CACHE_USER_PROFILE_URL;
     }
 
-
     public String getPasswordPattern() {
         return "^(?=.*[0-9])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{4,}$";
     }

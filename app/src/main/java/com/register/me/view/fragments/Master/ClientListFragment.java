@@ -144,7 +144,7 @@ public class ClientListFragment extends BaseFragment implements IFragment, Utils
     @Override
     public void onResume() {
         super.onResume();
-        fragmentChannel.setTitle("Client Dashboard");
+        fragmentChannel.setTitle("CLIENT DETAILS");
         masterNetworkCall.init(getContext(), message, this);
         showProgress();
         masterNetworkCall.getClientList(clientObserver);

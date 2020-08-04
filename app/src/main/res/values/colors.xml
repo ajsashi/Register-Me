@@ -24,5 +24,9 @@
     <color name="gray">#808080</color>
     <color name="green">#008000</color>
     <color name="blue">#3498DB</color>
+    <color name="view_bg_blue">#3054F2</color>
+    <color name="transparent">#00F44336</color>
+    <color name="yellow">#FFC107</color>
+    <color name="bid_green">#93EF93</color>
 
 </resources>

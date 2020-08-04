@@ -113,4 +113,10 @@ public class CertificationFragment extends BaseFragment implements IFragment, Ut
             rreNetworkCall.clearDisposable();
         }
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        fragmentChannel.setTitle("CRRE Certificate");
+    }
 }

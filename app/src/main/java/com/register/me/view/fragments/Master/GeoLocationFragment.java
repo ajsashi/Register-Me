@@ -170,6 +170,6 @@ adapter.getFilter().filter(s.toString());
     @Override
     public void onResume() {
         super.onResume();
-        fragmentChannel.setTitle("Geographic Location List");
+        fragmentChannel.setTitle("Geographic Locations");
     }
 }

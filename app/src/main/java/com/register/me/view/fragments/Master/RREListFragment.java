@@ -140,7 +140,7 @@ public class RREListFragment extends BaseFragment implements IFragment, Utils.Ut
     @Override
     public void onResume() {
         super.onResume();
-        fragmentChannel.setTitle("RRE Dashboard");
+        fragmentChannel.setTitle("RRE Details");
         masterNetworkCall.init(getContext(), message, this);
         showProgress();
         masterNetworkCall.getRREList(RREObserver);

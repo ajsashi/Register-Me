@@ -103,6 +103,16 @@ public class MasterViewDetailFragment extends BaseFragment implements IFragment,
     CardView certificate_stat_lay;
     @BindView(R.id.certificate_status)
     TextView certificate_status;
+
+    @BindView(R.id.txt_app_sub_date)
+    TextView txtAppSubDate;
+    @BindView(R.id.txt_inter_sub_date)
+    TextView txtInterSubDate;
+    @BindView(R.id.txt_polic_sub_date)
+    TextView txtPolicSubDate;
+    @BindView(R.id.txt_cert_sub_date)
+    TextView txtCertSubDate;
+
     private static Integer Screen;
     private static Integer Id;
     private static String app_Id;
@@ -494,6 +504,8 @@ public class MasterViewDetailFragment extends BaseFragment implements IFragment,
         } else {
             apl_stat_lay.setVisibility(View.VISIBLE);
             application_status.setText(applicationstatus);
+            txtAppSubDate.setVisibility(View.VISIBLE);
+            txtAppSubDate.setText(ctStatus.getApplicationdate());
             apl_stat_lay.setOnClickListener(v -> {
                 if (applicationstatus.equals("Approve")) {
                     showProgress();
@@ -510,6 +522,8 @@ public class MasterViewDetailFragment extends BaseFragment implements IFragment,
         } else {
             interview_stat_lay.setVisibility(View.VISIBLE);
             interview_status.setText(interviewstatus);
+            txtInterSubDate.setVisibility(View.VISIBLE);
+            txtInterSubDate.setText(ctStatus.getInterviewdate());
             interview_stat_lay.setOnClickListener(v -> {
                 if (interviewstatus.equals("Approve")) {
                     showProgress();
@@ -527,6 +541,8 @@ public class MasterViewDetailFragment extends BaseFragment implements IFragment,
         } else {
             policy_stat_lay.setVisibility(View.VISIBLE);
             app_policy_status.setText(policystatus);
+            txtPolicSubDate.setVisibility(View.VISIBLE);
+            txtPolicSubDate.setText(ctStatus.getApppolicydate());
             policy_stat_lay.setOnClickListener(v -> {
                 if (policystatus.equals("Approve")) {
                     showProgress();
@@ -543,6 +559,8 @@ public class MasterViewDetailFragment extends BaseFragment implements IFragment,
         } else {
             certificate_stat_lay.setVisibility(View.VISIBLE);
             certificate_status.setText(certificatestatus);
+            txtCertSubDate.setVisibility(View.VISIBLE);
+            txtCertSubDate.setText(ctStatus.getCertificatedate());
             certificate_stat_lay.setOnClickListener(v -> {
                 if (certificatestatus.equals("Approve")) {
                     showProgress();
