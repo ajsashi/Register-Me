@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/February2020-Register-11.02.2020.iml" filepath="$PROJECT_DIR$/February2020-Register-11.02.2020.iml" group="Register-11.02.2020" />
       <module fileurl="file://$PROJECT_DIR$/Register-11.02.2020.iml" filepath="$PROJECT_DIR$/Register-11.02.2020.iml" group="Register-11.02.2020" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="Register-11.02.2020/app" />
     </modules>

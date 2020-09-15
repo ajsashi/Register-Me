@@ -119,7 +119,6 @@ public class LoginActivity extends BaseActivity implements LoginPresenter.ILogin
 
     @Override
     public void navigate() {
-
             startActivity(new Intent(this, HomeActivity.class));
             finish();
     }
