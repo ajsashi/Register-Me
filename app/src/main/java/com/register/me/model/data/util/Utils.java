@@ -54,6 +54,7 @@ import java.util.Objects;
 
 public class Utils {
 
+
     private String commentTopic;
     private String editRegion;
     private AlertDialog networkAlertDialog;
